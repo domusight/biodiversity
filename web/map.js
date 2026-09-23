@@ -11,10 +11,11 @@
       }
     },
     satellite: {
-      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      url: "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2023_3857/default/g/{z}/{y}/{x}.jpg",
       options: {
-        attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
-        maxZoom: 19
+        attribution: 'Sentinel-2 cloudless &copy; <a href="https://s2maps.eu/">EOX</a> (contains modified Copernicus Sentinel data 2023)',
+        maxZoom: 19,
+        maxNativeZoom: 16
       }
     }
   };

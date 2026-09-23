@@ -26,6 +26,6 @@ python3 web/build_example_layer.py
 
 `.github/workflows/pages.yml` deploys this folder with GitHub Actions when `main` is pushed. In the repository settings, set Pages to **GitHub Actions**. The site is then `https://domusight.github.io/biodiversity/`.
 
-Basemap tiles are requested from CARTO (light map, © OpenStreetMap contributors © CARTO) and Esri (satellite). The index itself is computed in this repository. It is a neighbourhood screen, separate from the Statutory Biodiversity Metric and from species records.
+Basemap tiles are requested from CARTO (light map, © OpenStreetMap contributors © CARTO) and from EOX Sentinel-2 cloudless (satellite, contains modified Copernicus Sentinel data). The index itself is computed in this repository. It is a neighbourhood screen, separate from the Statutory Biodiversity Metric and from species records.
 
 Leaflet 1.9.4 is BSD-2-Clause. Leaflet.MagnifyingGlass is MIT. Both sit in `vendor/` with their licences.
