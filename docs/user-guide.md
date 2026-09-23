@@ -71,3 +71,5 @@ python3 examples/riverside_quarter/build_example.py
 The tests cover the distance transform, the crosswalk, the index, and the rank order on the synthetic site. They do not start QGIS. The Processing algorithm is ordinary PyQGIS and GDAL and is meant to be run from the toolbox.
 
 The synthetic site and its grid are described in `examples/riverside_quarter/README.md`.
+
+The same example is on the Leaflet map in `web/`. A magnifying glass shows the index as you move. From the repository root, `python3 -m http.server -d web 8765`, then open `http://127.0.0.1:8765/`. See `web/README.md`.

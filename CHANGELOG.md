@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Leaflet map with a magnifying glass. The glass follows the pointer and shows biodiversity potential at a closer zoom than the basemap. The published layer is the Riverside Quarter example.
+
 ## 0.1.0
 
 - First public version of the urban biodiversity potential index and the QGIS Processing algorithm.

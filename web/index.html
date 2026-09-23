@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biodiversity potential</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="vendor/leaflet-magnifying-glass/leaflet.magnifyingglass.css">
+  <link rel="stylesheet" href="map.css">
+</head>
+<body>
+  <div id="map" role="application" aria-label="Map. A magnifying glass shows biodiversity potential."></div>
+  <aside id="panel" aria-live="polite">
+    <p class="eyebrow">Urban ecology index</p>
+    <h1>Biodiversity potential</h1>
+    <p class="lede">Move the magnifying glass. It draws the index underneath, closer than the map around it.</p>
+    <p class="score" id="score">…</p>
+    <p class="class-name" id="class-name">Loading the worked example</p>
+    <p class="place" id="place"></p>
+    <ul class="legend" aria-label="Legend">
+      <li><i style="background:#f4f1ea"></i><span>0–15 Low</span></li>
+      <li><i style="background:#d7e4cf"></i><span>15–30 Limited</span></li>
+      <li><i style="background:#8fbf8a"></i><span>30–45 Moderate</span></li>
+      <li><i style="background:#2f9d6c"></i><span>45–65 High</span></li>
+      <li><i style="background:#146c43"></i><span>65–100 Very high</span></li>
+    </ul>
+    <div class="controls">
+      <label>Magnification <output id="zoom-readout">2</output>
+        <input id="zoom-offset" type="range" min="0" max="3" step="1" value="2">
+      </label>
+      <label>Lens size <output id="radius-readout">132</output>
+        <input id="radius" type="range" min="80" max="180" step="4" value="132">
+      </label>
+      <button type="button" id="toggle">Hide magnifying glass</button>
+      <div class="basemap" role="group" aria-label="Basemap">
+        <button type="button" id="basemap-light" aria-pressed="true">Light map</button>
+        <button type="button" id="basemap-satellite" aria-pressed="false">Satellite</button>
+      </div>
+      <div class="places" id="places" role="group" aria-label="Go to a place"></div>
+    </div>
+    <p class="note" id="zoom-note"></p>
+    <p class="note">Move the glass across the dashed circle. The colour is the 0–100 index for Riverside Quarter, a synthetic landscape placed in the English Channel so it stays separate from a real survey. London, Birmingham, Manchester and Leeds are on the map so this same glass can open their layers once those maps are published.</p>
+    <p class="note">A neighbourhood screen. It stands apart from the Statutory Biodiversity Metric and from species records.</p>
+    <p class="links">
+      <a href="https://github.com/domusight/biodiversity/blob/main/docs/method.md">Method</a>
+      <a href="https://github.com/domusight/biodiversity/blob/main/docs/theory.md">Theory</a>
+      <a href="https://github.com/domusight/biodiversity">Repository</a>
+    </p>
+  </aside>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="vendor/leaflet-magnifying-glass/leaflet.magnifyingglass.js"></script>
+  <script src="osgb.js"></script>
+  <script src="map.js"></script>
+</body>
+</html>

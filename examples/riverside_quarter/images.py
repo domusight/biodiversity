@@ -39,18 +39,23 @@ HABITAT_COLORS = {
 
 
 def write_png(path, rgb):
-    """Write an 8-bit RGB image. ``rgb`` is a uint8 array of shape (height, width, 3)."""
+    """Write an 8-bit RGB or RGBA image.
+
+    ``rgb`` is a uint8 array of shape (height, width, 3) or (height, width, 4).
+    Row 0 is the top of the file.
+    """
     rgb = np.asarray(rgb, dtype=np.uint8)
     height, width, channels = rgb.shape
-    if channels != 3:
-        raise ValueError("Expected an RGB image.")
+    if channels not in (3, 4):
+        raise ValueError("Expected an RGB or RGBA image.")
+    color_type = 2 if channels == 3 else 6
     raw = b"".join(b"\x00" + rgb[row].tobytes() for row in range(height))
 
     def chunk(tag, data):
         return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
 
     png = b"\x89PNG\r\n\x1a\n"
-    png += chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+    png += chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, color_type, 0, 0, 0))
     png += chunk(b"IDAT", zlib.compress(raw, 9))
     png += chunk(b"IEND", b"")
     with open(path, "wb") as handle:

@@ -10,7 +10,7 @@ dependencies = ["numpy>=1.22"]
 dev = ["pytest>=7"]
 
 [tool.pytest.ini_options]
-pythonpath = ["qgis", "examples/riverside_quarter"]
+pythonpath = ["qgis", "examples/riverside_quarter", "web"]
 testpaths = ["tests"]
 
 [tool.setuptools]

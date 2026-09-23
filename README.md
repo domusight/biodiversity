@@ -33,6 +33,18 @@ The same garden scores 40 beside the wood and 20 in the housing. The street besi
 
 The full component table, and the checks that keep these ranks stable, are in the [example notes](examples/riverside_quarter/README.md).
 
+## Look through the magnifying glass
+
+[web/index.html](web/index.html) is a Leaflet map. A magnifying glass follows the pointer and shows the biodiversity potential underneath, drawn closer than the basemap around it. Drag to move, and use the wheel to change scale. The lens stays with the pointer.
+
+The layer in the glass is the Riverside Quarter example above. London, Birmingham, Manchester and Leeds are places you can travel to. Their index layers are not published yet. The same glass will read them when they are added to `web/data/layers.json`.
+
+```
+python3 -m http.server -d web 8765
+```
+
+Then open `http://127.0.0.1:8765/`. Details are in [web/README.md](web/README.md).
+
 ## How the score is made
 
 Eight components, weighted in the order reported by Beninde, Veith and Hochkirch (2015): patch area and connectivity first, then vegetation structure, with local habitat ahead of a broad landscape label.
@@ -69,6 +81,7 @@ The tests cover the model. They do not launch QGIS. NumPy is the only runtime de
 qgis/biodiversity_potential/    QGIS plugin and the Python model
 docs/                           theory, method, data, user guide, references
 examples/riverside_quarter/     synthetic site, grid, and preview
+web/                            Leaflet map and magnifying glass
 tests/                          model, crosswalk, example ranks, plugin package
 ```
 

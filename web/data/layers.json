@@ -1,0 +1,163 @@
+{
+  "index_version": "0.1.0",
+  "layer": {
+    "id": "riverside-quarter",
+    "title": "Riverside Quarter",
+    "image": "data/riverside_potential.png",
+    "index": "data/riverside_index.json",
+    "bounds": [
+      [
+        50.25863584,
+        -1.44021075
+      ],
+      [
+        50.27469878,
+        -1.41476266
+      ]
+    ],
+    "center": [
+      50.26696719,
+      -1.42432829
+    ],
+    "zoom": 16,
+    "aoi_center": [
+      50.26666802,
+      -1.42748885
+    ],
+    "radius_m": 250.0,
+    "lens": [
+      50.26696719,
+      -1.42432829
+    ],
+    "samples": [
+      {
+        "id": "ancient_interior",
+        "name": "Ancient wood, interior",
+        "easting": 441125.0,
+        "northing": 40935.0,
+        "potential": 87.16
+      },
+      {
+        "id": "ancient_edge",
+        "name": "Ancient wood, edge",
+        "easting": 440995.0,
+        "northing": 40895.0,
+        "potential": 83.65
+      },
+      {
+        "id": "reedbed",
+        "name": "Reedbed",
+        "easting": 441045.0,
+        "northing": 40995.0,
+        "potential": 79.68
+      },
+      {
+        "id": "pond",
+        "name": "Pond",
+        "easting": 441035.0,
+        "northing": 40925.0,
+        "potential": 59.87
+      },
+      {
+        "id": "copse",
+        "name": "Copse",
+        "easting": 440805.0,
+        "northing": 40995.0,
+        "potential": 56.87
+      },
+      {
+        "id": "allotment",
+        "name": "Allotments",
+        "easting": 441085.0,
+        "northing": 40795.0,
+        "potential": 55.36
+      },
+      {
+        "id": "park",
+        "name": "Park grassland",
+        "easting": 440805.0,
+        "northing": 41075.0,
+        "potential": 24.74
+      },
+      {
+        "id": "garden_near",
+        "name": "Garden beside the wood",
+        "easting": 440945.0,
+        "northing": 41035.0,
+        "potential": 40.25
+      },
+      {
+        "id": "garden_far",
+        "name": "Garden in the housing",
+        "easting": 440755.0,
+        "northing": 40715.0,
+        "potential": 19.96
+      },
+      {
+        "id": "playing_field",
+        "name": "Playing field",
+        "easting": 440855.0,
+        "northing": 40795.0,
+        "potential": 16.78
+      },
+      {
+        "id": "verge",
+        "name": "Tree verge",
+        "easting": 440735.0,
+        "northing": 40995.0,
+        "potential": 45.46
+      },
+      {
+        "id": "sealed_between",
+        "name": "Sealed street beside the wood",
+        "easting": 440935.0,
+        "northing": 40895.0,
+        "potential": 5.63
+      },
+      {
+        "id": "sealed_south",
+        "name": "Sealed street in the south",
+        "easting": 440865.0,
+        "northing": 40675.0,
+        "potential": 2.56
+      }
+    ]
+  },
+  "places": [
+    {
+      "id": "riverside",
+      "title": "Example",
+      "lat": 50.26696719,
+      "lon": -1.42432829,
+      "zoom": 16
+    },
+    {
+      "id": "london",
+      "title": "London",
+      "lat": 51.5074,
+      "lon": -0.1278,
+      "zoom": 12
+    },
+    {
+      "id": "birmingham",
+      "title": "Birmingham",
+      "lat": 52.4799,
+      "lon": -1.9026,
+      "zoom": 12
+    },
+    {
+      "id": "manchester",
+      "title": "Manchester",
+      "lat": 53.4794,
+      "lon": -2.2453,
+      "zoom": 12
+    },
+    {
+      "id": "leeds",
+      "title": "Leeds",
+      "lat": 53.7997,
+      "lon": -1.5492,
+      "zoom": 12
+    }
+  ]
+}
