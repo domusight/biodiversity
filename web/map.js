@@ -27,13 +27,41 @@
   var grid;
   var mainTiles;
   var glassTiles;
+  var cityLayer = null;
+  var activePlace = null;
   var pointerInside = false;
   var lastContainerPoint = null;
   var glassOn = true;
 
+  var EMPTY_TILE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
   function tileLayer(name) {
     var spec = BASEMAPS[name];
     return L.tileLayer(spec.url, spec.options);
+  }
+
+  function syncGlassLayers() {
+    var layers = [glassTiles];
+    if (cityLayer) layers.push(cityLayer);
+    layers.push(potential);
+    glass.options.layers = layers;
+  }
+
+  function setCityTiles(url) {
+    var glassMap = glassOn && map.hasLayer(glass) ? glass.getMap() : null;
+    if (cityLayer && glassMap) glassMap.removeLayer(cityLayer);
+    cityLayer = null;
+    if (url) {
+      cityLayer = L.tileLayer(url, {
+        opacity: 1,
+        maxZoom: 19,
+        maxNativeZoom: 18,
+        errorTileUrl: EMPTY_TILE
+      });
+      if (glassMap) cityLayer.addTo(glassMap);
+    }
+    syncGlassLayers();
+    if (glassMap) raisePotential();
   }
 
   function indexClass(score) {
@@ -109,8 +137,13 @@
     var reading = sampleScore(latlng.lat, latlng.lng);
     if (!reading) {
       scoreEl.textContent = "—";
-      classEl.textContent = "No index on this ground";
-      placeEl.textContent = "";
+      if (activePlace && activePlace.tiles) {
+        classEl.textContent = activePlace.title;
+        placeEl.textContent = "The index for this city is drawn in the glass.";
+      } else {
+        classEl.textContent = "No index on this ground";
+        placeEl.textContent = "";
+      }
       updateZoomNote();
       return;
     }
@@ -163,7 +196,8 @@
       replacement.addTo(glass.getMap());
     }
     glassTiles = replacement;
-    glass.options.layers = [glassTiles, potential];
+    syncGlassLayers();
+    if (cityLayer && glassOn && map.hasLayer(glass)) cityLayer.bringToFront();
     if (glassOn && map.hasLayer(glass)) onGlassAdded();
     document.getElementById("basemap-light").setAttribute("aria-pressed", name === "light" ? "true" : "false");
     document.getElementById("basemap-satellite").setAttribute("aria-pressed", name === "satellite" ? "true" : "false");
@@ -267,13 +301,17 @@
     });
 
     var places = document.getElementById("places");
+    activePlace = manifest.places[0];
     manifest.places.forEach(function (place) {
       var button = document.createElement("button");
       button.type = "button";
       button.textContent = place.title;
       button.addEventListener("click", function () {
+        activePlace = place;
         pointerInside = false;
+        setCityTiles(place.tiles || null);
         map.flyTo([place.lat, place.lon], place.zoom);
+        moveGlass(map.getCenter());
       });
       places.appendChild(button);
     });

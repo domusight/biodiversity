@@ -158,6 +158,23 @@ def example_layer():
     }
 
 
+def attach_tiles(places, previous_places):
+    """Keep a published tile URL when the example layer is regenerated.
+
+    City rasters are hosted outside git, typically at
+    ``https://storage.googleapis.com/<bucket>/<city>/{z}/{x}/{y}.png``.
+    """
+    saved = {}
+    for place in previous_places or []:
+        tiles = place.get("tiles")
+        if tiles:
+            saved[place["id"]] = tiles
+    for place in places:
+        if place["id"] in saved:
+            place["tiles"] = saved[place["id"]]
+    return places
+
+
 def manifest(layer):
     """JSON manifest consumed by web/map.js."""
     example_view = {
@@ -200,6 +217,11 @@ def manifest(layer):
 
 def main():
     os.makedirs(_DATA, exist_ok=True)
+    manifest_path = os.path.join(_DATA, "layers.json")
+    previous_places = []
+    if os.path.isfile(manifest_path):
+        with open(manifest_path, encoding="utf-8") as handle:
+            previous_places = json.load(handle).get("places", [])
     layer = example_layer()
     write_png(os.path.join(_DATA, "riverside_potential.png"), layer["rgba"])
     index_path = os.path.join(_DATA, "riverside_index.json")
@@ -219,8 +241,10 @@ def main():
             separators=(",", ":"),
         )
         handle.write("\n")
-    with open(os.path.join(_DATA, "layers.json"), "w", encoding="utf-8") as handle:
-        json.dump(manifest(layer), handle, indent=2)
+    published = manifest(layer)
+    attach_tiles(published["places"], previous_places)
+    with open(manifest_path, "w", encoding="utf-8") as handle:
+        json.dump(published, handle, indent=2)
         handle.write("\n")
 
 

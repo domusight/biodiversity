@@ -2,7 +2,7 @@
 
 A Leaflet map with a [magnifying glass](https://github.com/bbecquet/Leaflet.MagnifyingGlass). The glass follows the pointer and shows biodiversity potential at a closer zoom than the basemap around it. Scroll the wheel to change the scale. The lens stays on the pointer, so the index underneath is what gets larger.
 
-The layer on the page is the synthetic [Riverside Quarter](../examples/riverside_quarter/README.md) example. It is drawn in the English Channel on purpose. London, Birmingham, Manchester and Leeds are camera positions. Their index layers are not in this folder yet. A later layer can be an image overlay with bounds, like the example, or XYZ tiles: add it to the glass in `map.js` the same way `riverside_potential.png` is added, and extend `data/layers.json`.
+The layer on the page is the synthetic [Riverside Quarter](../examples/riverside_quarter/README.md) example. It is drawn in the English Channel on purpose. London, Birmingham, Manchester and Leeds are camera positions. Their index layers are not in this folder yet. A public XYZ tile URL on a place in `data/layers.json` is drawn in the glass when that city is selected.
 
 ## Preview
 
@@ -21,6 +21,29 @@ python3 web/build_example_layer.py
 ```
 
 `tests/test_web_layer.py` checks that the published grid still matches the named scores.
+
+## City tiles on Google Cloud
+
+The HTML stays in this repository. The city rasters are too large to commit, so they belong in a Cloud Storage bucket with public read on the tile objects. No API key goes in the page. The light map and the Sentinel-2 cloudless basemap stay on their own servers.
+
+Object names:
+
+```
+london/{z}/{x}/{y}.png
+birmingham/{z}/{x}/{y}.png
+manchester/{z}/{x}/{y}.png
+leeds/{z}/{x}/{y}.png
+```
+
+Set `tiles` on that city in `data/layers.json`:
+
+```json
+"tiles": "https://storage.googleapis.com/BUCKET/london/{z}/{x}/{y}.png"
+```
+
+Choosing the city then puts those tiles in the magnifying glass. Rebuilding the example keeps a `tiles` URL that is already in the file. The bucket can use uniform access and grant `allUsers` the Storage Object Viewer role on the tile objects. The glass loads them as images.
+
+Sentinel-2 NDVI for those cities can be built in Earth Engine on the same Google account. OS Open Greenspace, OS Open Rivers, and the Natural England inventories still come from their own downloads.
 
 ## Publishing
 

@@ -37,7 +37,7 @@ The full component table, and the checks that keep these ranks stable, are in th
 
 [web/index.html](web/index.html) is a Leaflet map. A magnifying glass follows the pointer and shows the biodiversity potential underneath, drawn closer than the basemap around it. Drag to move, and use the wheel to change scale. The lens stays with the pointer.
 
-The layer in the glass is the Riverside Quarter example above. London, Birmingham, Manchester and Leeds are places you can travel to. Their index layers are not published yet. The same glass will read them when they are added to `web/data/layers.json`.
+The layer in the glass is the Riverside Quarter example above. London, Birmingham, Manchester and Leeds are places you can travel to. Their index layers are not published yet. A public Cloud Storage tile URL on a city in `web/data/layers.json` is what the glass will read. Details are in [web/README.md](web/README.md).
 
 ```
 python3 -m http.server -d web 8765

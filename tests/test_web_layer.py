@@ -12,7 +12,7 @@ import zlib
 import numpy as np
 import pytest
 
-from build_example_layer import example_layer, sample_grid
+from build_example_layer import attach_tiles, example_layer, sample_grid
 from osgb import bng_to_wgs84, wgs84_to_bng
 
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -78,6 +78,23 @@ def test_published_files_match_the_model():
     png = _read_png(os.path.join(_DATA, "riverside_potential.png"))
     assert png.shape == layer["rgba"].shape
     assert np.array_equal(png, layer["rgba"])
+
+
+def test_city_tile_urls_survive_a_rebuild():
+    places = [
+        {"id": "riverside", "title": "Example"},
+        {"id": "london", "title": "London"},
+    ]
+    previous = [
+        {
+            "id": "london",
+            "tiles": "https://storage.googleapis.com/example-bucket/london/{z}/{x}/{y}.png",
+        },
+        {"id": "birmingham", "title": "Birmingham"},
+    ]
+    attach_tiles(places, previous)
+    assert places[1]["tiles"] == previous[0]["tiles"]
+    assert "tiles" not in places[0]
 
 
 def test_javascript_transform_matches_python():
