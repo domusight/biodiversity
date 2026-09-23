@@ -1,0 +1,18 @@
+[general]
+name=Biodiversity potential
+qgisMinimumVersion=3.28
+description=Screen a small urban area for biodiversity potential from open habitat, designation and satellite data.
+version=0.1.0
+author=Domusight
+email=domusight@users.noreply.github.com
+about=Landscape-ecology screening index for a neighbourhood of a few hundred metres. Not a species survey and not the Statutory Biodiversity Metric.
+tracker=https://github.com/domusight/biodiversity/issues
+repository=https://github.com/domusight/biodiversity
+homepage=https://github.com/domusight/biodiversity
+category=Analysis
+icon=icon.png
+experimental=False
+deprecated=False
+tags=biodiversity,urban,ecology,ndvi
+hasProcessingProvider=yes
+server=False
