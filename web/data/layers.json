@@ -136,7 +136,8 @@
       "title": "London",
       "lat": 51.5074,
       "lon": -0.1278,
-      "zoom": 12
+      "zoom": 12,
+      "tiles": "https://storage.googleapis.com/biodiversity-potential/london/{z}/{x}/{y}.png"
     },
     {
       "id": "birmingham",
