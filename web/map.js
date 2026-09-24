@@ -20,7 +20,6 @@
     }
   };
 
-  var INDEX_OPACITY = 0.72;
   var EMPTY_TILE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
   var map;
@@ -49,7 +48,7 @@
     if (!url) return;
     indexLayer = L.tileLayer(url, {
       pane: "index",
-      opacity: INDEX_OPACITY,
+      opacity: 1,
       maxZoom: 19,
       maxNativeZoom: 16,
       errorTileUrl: EMPTY_TILE
@@ -94,6 +93,7 @@
     map.getPane("imagery").style.zIndex = 200;
     map.createPane("index");
     map.getPane("index").style.zIndex = 450;
+    map.getPane("index").style.mixBlendMode = "multiply";
 
     map.attributionControl.addAttribution(
       '<a href="https://github.com/domusight/biodiversity">Biodiversity potential</a>'
