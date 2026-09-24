@@ -109,7 +109,7 @@ Hill and colleagues (2017) compared 240 urban ponds with 782 ponds outside towns
 
 Distance to the nearest water or wetland cell decays with a 100 m half-distance, shorter than the terrestrial half-distance, because the effect of a pond or a river bank is local. A cell of open water or wetland scores 1.
 
-OS Open Rivers is a centreline. The tool buffers it by an assumed width (8 m by default) and thickens it to at least about one cell, so a stream is not lost between the sample points of a 10 m grid. That width is an assumption. OS Open Map Local `SurfaceWater_Area` and `TidalWater` are the polygons to use.
+OS Open Rivers is a centreline. The tool buffers it by an assumed width (8 m by default) and thickens it to at least about one cell, so a stream is not lost between the sample points of a 10 m grid. That width is an assumption. Links marked fictitious, or described as underground, a culvert, or a tunnel, are left out. OS Open Map Local `SurfaceWater_Area` and `TidalWater` are the polygons to use.
 
 ## Heterogeneity
 

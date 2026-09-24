@@ -35,6 +35,7 @@ from .crosswalk import SCHEME_ESA, SCHEME_KEYWORD, SCHEME_PRIORITY, combine_habi
 from .habitats import Habitat, label
 from .limits import DEMO_RADIUS_M, farthest_from_point, within_demo_radius
 from .model import COMPONENT_ORDER, Weights, ModelConfig, run_model
+from .water import is_hidden_centreline
 
 _STYLE = os.path.join(os.path.dirname(__file__), "style", "biodiversity_potential.qml")
 _OUTPUT_NODATA = -9999.0
@@ -205,7 +206,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         self._add_layer(self.OVERLAY, "Local habitat overlay (woodland, UKHab, Phase 1)")
         self._add_field(self.OVERLAY_FIELD, "Overlay class field", self.OVERLAY)
         self._add_scheme(self.OVERLAY_SCHEME, "Overlay classification", default=1)
-        self._add_layer(self.RIVERS, "River centrelines (OS Open Rivers)")
+        self._add_layer(self.RIVERS, "River centrelines (surface only; underground and culverts are left out)")
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.RIVER_WIDTH,
@@ -414,9 +415,8 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             if rivers is not None:
                 width = self.parameterAsDouble(parameters, self.RIVER_WIDTH, context)
                 layers.append(
-                    self._burn_constant(
-                        rivers, grid, target_crs, context, feedback,
-                        int(Habitat.OPEN_WATER), "Rivers", True, width / 2.0,
+                    self._burn_surface_rivers(
+                        rivers, grid, target_crs, context, feedback, width / 2.0,
                     )
                 )
             priority = self.parameterAsVectorLayer(parameters, self.PRIORITY, context)
@@ -589,6 +589,20 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         return self._burn_fixed_scheme(
             layer, grid, crs, context, feedback,
             self.PRIORITY_FIELD, parameters, SCHEME_PRIORITY, "Priority Habitat Inventory", False,
+        )
+
+    def _burn_surface_rivers(self, layer, grid, crs, context, feedback, line_buffer):
+        def code_for_feature(feature):
+            attributes = {}
+            for field in feature.fields():
+                attributes[field.name().lower()] = feature[field.name()]
+            if is_hidden_centreline(attributes):
+                return None, "Underground and culverted centrelines were left out."
+            return int(Habitat.OPEN_WATER), None
+
+        return burn_layer(
+            layer, grid, crs, context, code_for_feature, feedback, "Rivers",
+            line_buffer_m=line_buffer, all_touched=True,
         )
 
     def _burn_constant(self, layer, grid, crs, context, feedback, code, label_text, all_touched, line_buffer):

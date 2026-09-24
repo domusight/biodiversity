@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Version 0.2.4 leaves out river centrelines that are underground or culverted. OS Open Rivers marks these links `fictitious`.
+
 - Version 0.2.3 adds **Tidal water** for OS Open Map Local `TidalWater`, beside `SurfaceWater_Area`. Both score as open water.
 
 - Version 0.2.2 adds **Woodland polygons** for ordinary woods, such as OS Open Zoomstack `woodland`. Ancient woodland still overwrites those polygons.
