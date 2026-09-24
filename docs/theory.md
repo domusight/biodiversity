@@ -109,7 +109,7 @@ Hill and colleagues (2017) compared 240 urban ponds with 782 ponds outside towns
 
 Distance to the nearest water or wetland cell decays with a 100 m half-distance, shorter than the terrestrial half-distance, because the effect of a pond or a river bank is local. A cell of open water or wetland scores 1.
 
-OS Open Rivers is a centreline. The tool buffers it by an assumed width (8 m by default) and thickens it to at least about one cell, so a stream is not lost between the sample points of a 10 m grid. That width is an assumption. Where OS surface-water polygons or Zoomstack surface water are available, they are the better source.
+OS Open Rivers is a centreline. The tool buffers it by an assumed width (8 m by default) and thickens it to at least about one cell, so a stream is not lost between the sample points of a 10 m grid. That width is an assumption. OS Open Map Local `SurfaceWater_Area` and `TidalWater` are the polygons to use.
 
 ## Heterogeneity
 
@@ -147,9 +147,9 @@ The model never sees a file format. It sees a habitat grid, an optional NDVI gri
 | --- | --- | --- |
 | 1 | Wall-to-wall land cover, often ESA WorldCover | Fills every cell. In towns, WorldCover grassland is read as amenity grass, because the class mixes pasture and lawns. Priority habitat later corrects real meadows. |
 | 2 | OS Open Greenspace | Re-labels public parks, allotments, cemeteries and tennis courts. A park is amenity grass until a woodland polygon says otherwise. |
-| 3 | Woodland polygons | OS Zoomstack `woodland`, or any polygon layer of ordinary woods. Ancient woodland still overwrites these. |
+| 3 | Woodland polygons | OS Open Map Local `Woodland`, or any polygon layer of ordinary woods. Ancient woodland still overwrites these. |
 | 4 | Local habitat overlay | A Phase 1 or UKHab export, where it is more detailed than the woodland polygons. |
-| 5 | Surface water, then river centrelines | Open water. |
+| 5 | Surface water area, then tidal water, then river centrelines | Open water. Surface water is inland. Tidal water runs up to the Normal Tidal Limit, which is the Thames through London. |
 | 6 | Priority Habitat Inventory | High distinctiveness. Bogs and limestone pavement are treated as irreplaceable. Ponds and lakes become priority water. Names the list does not recognise still score as priority habitat, and the log says so. |
 | 7 | Ancient woodland | Very high distinctiveness. Where a county has a revised Ancient Woodland Inventory, that revision should be used for the county. |
 

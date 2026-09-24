@@ -21,14 +21,14 @@ class LargeAreaAlgorithm(BiodiversityPotentialAlgorithm):
         return "urban_biodiversity_potential_large"
 
     def displayName(self):
-        return self.tr("Urban biodiversity potential (large area) 0.2.2")
+        return self.tr("Urban biodiversity potential (large area) 0.2.3")
 
     def shortHelpString(self):
         return self.tr(
             "Scores a whole city or district from a boundary polygon, such as "
             "Greater London. Supply the full input layers. The tool reads only "
             "the features that meet the boundary plus the context buffer, so "
-            "you do not clip the files yourself. Version 0.2.2 has four NDVI "
+            "you do not clip the files yourself. Version 0.2.3 has four NDVI "
             "rows, tile 1 to tile 4. Each row has the same file browser as the "
             "other layers. Add one overlapping Sentinel-2 NDVI raster to each "
             "row. Where the tiles cover the same ground, one value is kept and "

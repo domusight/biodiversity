@@ -94,6 +94,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     RIVERS = "RIVERS"
     RIVER_WIDTH = "RIVER_WIDTH"
     SURFACE_WATER = "SURFACE_WATER"
+    TIDAL_WATER = "TIDAL_WATER"
     PRIORITY = "PRIORITY"
     PRIORITY_FIELD = "PRIORITY_FIELD"
     ANCIENT = "ANCIENT"
@@ -145,8 +146,8 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             "It is a screening map for where potential sits. It is not a species "
             "survey, and it is not the Statutory Biodiversity Metric. Give it "
             "British National Grid layers: a wall-to-wall land cover such as ESA "
-            "WorldCover, OS Open Greenspace, OS Open Rivers or Zoomstack surface "
-            "water, the Priority Habitat Inventory, Ancient Woodland, and an "
+            "WorldCover, OS Open Greenspace, OS Open Map Local surface water and "
+            "tidal water, the Priority Habitat Inventory, Ancient Woodland, and an "
             "optional Sentinel-2 NDVI raster. The tool buffers the area itself so "
             "edge cells can see the surrounding landscape; input layers should "
             "cover that wider context.\n\n"
@@ -200,7 +201,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         self._add_scheme(self.BASE_SCHEME, "Base classification", default=0)
         self._add_layer(self.GREENSPACE, "OS Open Greenspace")
         self._add_field(self.GREENSPACE_FIELD, "Greenspace function field", self.GREENSPACE)
-        self._add_layer(self.WOODLAND, "Woodland polygons (OS Zoomstack woodland)")
+        self._add_layer(self.WOODLAND, "Woodland polygons (OS Open Map Local Woodland)")
         self._add_layer(self.OVERLAY, "Local habitat overlay (woodland, UKHab, Phase 1)")
         self._add_field(self.OVERLAY_FIELD, "Overlay class field", self.OVERLAY)
         self._add_scheme(self.OVERLAY_SCHEME, "Overlay classification", default=1)
@@ -214,7 +215,8 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                 minValue=1.0,
             )
         )
-        self._add_layer(self.SURFACE_WATER, "Surface water polygons")
+        self._add_layer(self.SURFACE_WATER, "Surface water area (OS Open Map Local SurfaceWater_Area)")
+        self._add_layer(self.TIDAL_WATER, "Tidal water (OS Open Map Local TidalWater)")
         self._add_layer(self.PRIORITY, "Priority Habitat Inventory")
         self._add_field(self.PRIORITY_FIELD, "Priority habitat name field", self.PRIORITY)
         self._add_layer(self.ANCIENT, "Ancient woodland")
@@ -398,6 +400,14 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                     self._burn_constant(
                         water, grid, target_crs, context, feedback,
                         int(Habitat.OPEN_WATER), "Surface water", True, 0.0,
+                    )
+                )
+            tidal = self.parameterAsVectorLayer(parameters, self.TIDAL_WATER, context)
+            if tidal is not None:
+                layers.append(
+                    self._burn_constant(
+                        tidal, grid, target_crs, context, feedback,
+                        int(Habitat.OPEN_WATER), "Tidal water", True, 0.0,
                     )
                 )
             rivers = self.parameterAsVectorLayer(parameters, self.RIVERS, context)

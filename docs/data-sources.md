@@ -11,7 +11,7 @@ Absence in these inventories is not evidence that habitat is absent. The Priorit
 | Dataset | Use in the tool | Licence and where to get it |
 | --- | --- | --- |
 | ESA WorldCover 10 m v200 | Base land cover. Class 10 woodland, 20 scrub, 30 amenity grass (an urban reading of the grassland class), 40 cultivated, 50 sealed, 80 water, 90 wetland. | CC BY 4.0. [esa-worldcover.org](https://esa-worldcover.org/). Cite Zanaga et al. (2022), doi:10.5281/zenodo.7254221. |
-| OS Open Zoomstack | Layer `woodland` in **Woodland polygons**. Layer `surfacewater` in **Surface water polygons**. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenZoomstack). |
+| OS Open Map Local | `SurfaceWater_Area` in **Surface water area**. `TidalWater` in **Tidal water**. `Woodland` in **Woodland polygons**. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenMapLocal). |
 | OS Open Greenspace | Public parks, playing fields, allotments, cemeteries, religious grounds, golf courses, play space, sports facilities, tennis courts. Field `function`. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenGreenspace). Code list: [FunctionValue](https://docs.os.uk/os-downloads/products/land-and-terrain-portfolio/os-open-greenspace/os-open-greenspace-technical-specification/code-lists/functionvalue). |
 | OS Open Rivers | River centrelines. Buffered by the assumed width, default 8 m. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenRivers). |
 | National Forest Inventory | Optional woodland overlay. Keyword scheme. | Open Government Licence. Forestry Commission / Forestry England open data. |
@@ -56,7 +56,7 @@ NDVI is optional. Without it, vegetation drops out and the other weights are res
 
 - Private gardens, green roofs, street trees under a 10 m canopy, and garden ponds are mostly missing.
 - WorldCover grassland in a city is treated as modified grass on purpose. Run the Priority Habitat Inventory as well, or semi-natural grassland will be undervalued.
-- A wood in Zoomstack or WorldCover is not ancient and is not automatically priority habitat.
+- A wood in Open Map Local or WorldCover is not ancient and is not automatically priority habitat.
 - River width is not surveyed. Prefer surface-water polygons where you have them.
 
 Attribute OS data as “Contains OS data © Crown copyright and database right [year]”. Attribute Natural England layers as required on the download page, including the OS acknowledgement those layers carry.
