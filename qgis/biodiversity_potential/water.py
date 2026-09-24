@@ -1,5 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Decide which river centrelines are on the surface."""
+"""Decide which river centrelines are on the surface.
+
+OS Open Rivers ``fictitious`` means the link is a straight line with no
+intermediate vertices. It does not mean the water is underground. Narrow
+visible streams belong on OS Open Map Local ``SurfaceWater_Line``, which
+only draws water that was surveyed on the surface.
+"""
 
 _FICTITIOUS_FIELDS = ("fictitious", "fictitiou")
 _LEVEL_FIELDS = (
@@ -19,16 +25,26 @@ _HIDDEN_WORDS = (
 )
 
 
-def is_hidden_centreline(attributes):
-    """True when a centreline is underground, culverted, or a network connector.
+OPEN_RIVERS_NOTE = (
+    "OS Open Rivers fictitious means a straight line, not a culvert, so those "
+    "links were kept. Leave River centrelines empty when Surface water lines "
+    "is set. Open Rivers also draws network links that are not visible water. "
+    "Narrow streams are OS Open Map Local SurfaceWater_Line."
+)
 
-    ``attributes`` maps a lower-case field name to its value. OS Open Rivers
-    marks those links ``fictitious``. A level or containment field that says
-    underground, culvert, or tunnel is the same exclusion.
+
+def is_fictitious_geometry(attributes):
+    """True when Open Rivers has marked the link as a straight-line geometry."""
+    return any(_is_true(attributes.get(name)) for name in _FICTITIOUS_FIELDS)
+
+
+def is_hidden_centreline(attributes):
+    """True when a centreline is described as underground, culverted, or in a tunnel.
+
+    ``attributes`` maps a lower-case field name to its value. A straight-line
+    ``fictitious`` flag is not this test. Only a level or containment field
+    that says underground, culvert, or tunnel is excluded.
     """
-    for name in _FICTITIOUS_FIELDS:
-        if name in attributes and _is_true(attributes[name]):
-            return True
     for name in _LEVEL_FIELDS:
         if name not in attributes or attributes[name] is None:
             continue

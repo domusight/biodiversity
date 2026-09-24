@@ -111,7 +111,11 @@ Hill and colleagues (2017) compared 240 urban ponds with 782 ponds outside towns
 
 Distance to the nearest water or wetland cell decays with a 100 m half-distance. That is shorter than the 250 m terrestrial half-distance on purpose: a pond or a bank is a local effect, and Hill et al. (2017) is about the water body itself, not about a catchment. The 100 m figure is a modelling choice set below the terrestrial neighbourhood. It is not a measured aquatic dispersal distance. A cell of open water or wetland scores 1.
 
-OS Open Rivers is a centreline. The tool buffers it by an assumed width (8 m by default) and thickens it to at least about one cell, so a stream is not lost between the sample points of a 10 m grid. That width is an assumption. Links marked fictitious, or described as underground, a culvert, or a tunnel, are left out. OS Open Map Local `SurfaceWater_Area` and `TidalWater` are the polygons to use.
+OS Open Map Local draws inland water in two layers. `SurfaceWater_Area` is water wide enough to be a polygon. `SurfaceWater_Line` is the inland water that was not wide enough, which is where the missing streams are. The tool buffers those lines by an assumed width (8 m by default) and thickens them to at least about one cell, so a stream is not lost between the sample points of a 10 m grid. That width is an assumption. The area polygons are painted afterwards, so a river that widens keeps its surveyed shape.
+
+`TidalWater` is the tidal polygon, up to the Normal Tidal Limit.
+
+OS Open Rivers is a connected network, not a map of visible water. Its `fictitious` flag means the link was drawn as a straight line. It does not mean a culvert. The open product has no field that separates a surface stream from a link through a culvert, so those centrelines should be left empty once `SurfaceWater_Line` is used. A centreline whose level or containment says underground, culvert, or tunnel is still left out.
 
 ## Heterogeneity
 
@@ -151,7 +155,7 @@ The model never sees a file format. It sees a habitat grid, an optional NDVI gri
 | 2 | OS Open Greenspace | Re-labels public parks, allotments, cemeteries and tennis courts. A park is amenity grass until a woodland polygon says otherwise. |
 | 3 | Woodland polygons | OS Open Map Local `Woodland`, or any polygon layer of ordinary woods. Ancient woodland still overwrites these. |
 | 4 | Local habitat overlay | A Phase 1 or UKHab export, where it is more detailed than the woodland polygons. |
-| 5 | Surface water area, then tidal water, then river centrelines | Open water. Surface water is inland. Tidal water runs up to the Normal Tidal Limit, which is the Thames through London. |
+| 5 | Surface water lines, then surface water area, then tidal water | Open water. Lines are the narrow streams. Areas overwrite them where the water is wide enough to be a polygon. Tidal water runs up to the Normal Tidal Limit, which is the Thames through London. |
 | 6 | Priority Habitat Inventory | High distinctiveness. Bogs and limestone pavement are treated as irreplaceable. Ponds and lakes become priority water. Names the list does not recognise still score as priority habitat, and the log says so. |
 | 7 | Ancient woodland | Very high distinctiveness. Where a county has a revised Ancient Woodland Inventory, that revision should be used for the county. |
 
@@ -193,7 +197,7 @@ A number in the model is either taken from a cited result or set as a modelling 
 | Structural habitat | distinctiveness ≥ 0.40 | Above gardens (0.35) and below allotments (0.45), so lawns and property parcels do not form patches (Goddard, Dougill and Benton 2010) and allotments do (Speak, Mizgajski and Borysiak 2015). |
 | Heterogeneity classes | distinctiveness ≥ 0.35 | The garden score. A garden counts as structure; amenity grass does not. |
 | Distinctiveness bands | 0, 2, 4, 6, 8, divided by 8 | Statutory Biodiversity Metric (Natural England 2023). Gardens and allotments are placed between the low and medium bands (Davies et al. 2009; Goddard, Dougill and Benton 2010; Speak, Mizgajski and Borysiak 2015). Undifferentiated woodland is placed at 0.625, between medium and high, because the open layers do not separate plantation from semi-natural wood. |
-| River width | 8 m | Modelling choice, about one cell. Open Rivers does not carry a width. Underground and culverted links are excluded. |
+| Water-line width | 8 m | Modelling choice, about one cell. `SurfaceWater_Line` has no width. A centreline described as underground, a culvert, or a tunnel is excluded. |
 | Component weights | 0.22, 0.18, 0.16, 0.14, 0.14, 0.08, 0.05, 0.03 | Order from Beninde, Veith and Hochkirch (2015). The values are a translation of that order, not a fitted model. |
 | Legend breaks | 15, 30, 45, 65 | Round numbers chosen so the example separates sealed land, amenity grass, gardens, allotments and ancient woodland. Not quantiles. |
 | Public demo site cap | 500 m from the site centre | A product limit, so the public tool stays a neighbourhood demonstration. It is not an ecological radius. The neighbourhood stays 250 m. |

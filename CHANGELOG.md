@@ -2,9 +2,11 @@
 
 ## Unreleased
 
+- Version 0.2.5 adds **Surface water lines** for OS Open Map Local `SurfaceWater_Line`, the streams too narrow to appear in `SurfaceWater_Area`. Leave river centrelines empty. On OS Open Rivers, `fictitious` means a straight line, not a culvert.
+
 - The method notes now cite a source for each default, including the 250 m neighbourhood. Numbers that are modelling choices are labelled as choices.
 
-- Version 0.2.4 leaves out river centrelines that are underground or culverted. OS Open Rivers marks these links `fictitious`.
+- Version 0.2.4 left out Open Rivers links with `fictitious` set. That flag is a straight line, not a culvert. Version 0.2.5 corrects it.
 
 - Version 0.2.3 adds **Tidal water** for OS Open Map Local `TidalWater`, beside `SurfaceWater_Area`. Both score as open water.
 

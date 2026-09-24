@@ -2,7 +2,7 @@
 name=Biodiversity potential
 qgisMinimumVersion=3.28
 description=Screen one urban site, within 500 m of its centre, for biodiversity potential from open habitat, designation and satellite data.
-version=0.2.4
+version=0.2.5
 author=Domusight
 email=domusight@users.noreply.github.com
 about=Landscape-ecology screening index for a neighbourhood of a few hundred metres. Not a species survey and not the Statutory Biodiversity Metric.

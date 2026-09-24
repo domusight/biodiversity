@@ -35,7 +35,7 @@ from .crosswalk import SCHEME_ESA, SCHEME_KEYWORD, SCHEME_PRIORITY, combine_habi
 from .habitats import Habitat, label
 from .limits import DEMO_RADIUS_M, farthest_from_point, within_demo_radius
 from .model import COMPONENT_ORDER, Weights, ModelConfig, run_model
-from .water import is_hidden_centreline
+from .water import OPEN_RIVERS_NOTE, is_fictitious_geometry, is_hidden_centreline
 
 _STYLE = os.path.join(os.path.dirname(__file__), "style", "biodiversity_potential.qml")
 _OUTPUT_NODATA = -9999.0
@@ -94,6 +94,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     OVERLAY_SCHEME = "OVERLAY_SCHEME"
     RIVERS = "RIVERS"
     RIVER_WIDTH = "RIVER_WIDTH"
+    SURFACE_WATER_LINE = "SURFACE_WATER_LINE"
     SURFACE_WATER = "SURFACE_WATER"
     TIDAL_WATER = "TIDAL_WATER"
     PRIORITY = "PRIORITY"
@@ -147,8 +148,8 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             "It is a screening map for where potential sits. It is not a species "
             "survey, and it is not the Statutory Biodiversity Metric. Give it "
             "British National Grid layers: a wall-to-wall land cover such as ESA "
-            "WorldCover, OS Open Greenspace, OS Open Map Local surface water and "
-            "tidal water, the Priority Habitat Inventory, Ancient Woodland, and an "
+            "WorldCover, OS Open Greenspace, OS Open Map Local surface water lines, "
+            "surface water area and tidal water, the Priority Habitat Inventory, Ancient Woodland, and an "
             "optional Sentinel-2 NDVI raster. The tool buffers the area itself so "
             "edge cells can see the surrounding landscape; input layers should "
             "cover that wider context.\n\n"
@@ -206,11 +207,14 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         self._add_layer(self.OVERLAY, "Local habitat overlay (woodland, UKHab, Phase 1)")
         self._add_field(self.OVERLAY_FIELD, "Overlay class field", self.OVERLAY)
         self._add_scheme(self.OVERLAY_SCHEME, "Overlay classification", default=1)
-        self._add_layer(self.RIVERS, "River centrelines (surface only; underground and culverts are left out)")
+        self._add_layer(
+            self.SURFACE_WATER_LINE,
+            "Surface water lines (OS Open Map Local SurfaceWater_Line, the narrow streams)",
+        )
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.RIVER_WIDTH,
-                self.tr("Assumed river width (metres)"),
+                self.tr("Assumed width of water lines (metres)"),
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=8.0,
                 minValue=1.0,
@@ -218,6 +222,10 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         )
         self._add_layer(self.SURFACE_WATER, "Surface water area (OS Open Map Local SurfaceWater_Area)")
         self._add_layer(self.TIDAL_WATER, "Tidal water (OS Open Map Local TidalWater)")
+        self._add_layer(
+            self.RIVERS,
+            "River centrelines (optional; leave empty if Surface water lines is set)",
+        )
         self._add_layer(self.PRIORITY, "Priority Habitat Inventory")
         self._add_field(self.PRIORITY_FIELD, "Priority habitat name field", self.PRIORITY)
         self._add_layer(self.ANCIENT, "Ancient woodland")
@@ -395,6 +403,15 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                         self.OVERLAY_FIELD, self.OVERLAY_SCHEME, parameters, "Habitat overlay", False,
                     )
                 )
+            line_buffer = self.parameterAsDouble(parameters, self.RIVER_WIDTH, context) / 2.0
+            water_lines = self.parameterAsVectorLayer(parameters, self.SURFACE_WATER_LINE, context)
+            if water_lines is not None:
+                layers.append(
+                    self._burn_constant(
+                        water_lines, grid, target_crs, context, feedback,
+                        int(Habitat.OPEN_WATER), "Surface water lines", True, line_buffer,
+                    )
+                )
             water = self.parameterAsVectorLayer(parameters, self.SURFACE_WATER, context)
             if water is not None:
                 layers.append(
@@ -413,10 +430,9 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                 )
             rivers = self.parameterAsVectorLayer(parameters, self.RIVERS, context)
             if rivers is not None:
-                width = self.parameterAsDouble(parameters, self.RIVER_WIDTH, context)
                 layers.append(
                     self._burn_surface_rivers(
-                        rivers, grid, target_crs, context, feedback, width / 2.0,
+                        rivers, grid, target_crs, context, feedback, line_buffer,
                     )
                 )
             priority = self.parameterAsVectorLayer(parameters, self.PRIORITY, context)
@@ -597,8 +613,9 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             for field in feature.fields():
                 attributes[field.name().lower()] = feature[field.name()]
             if is_hidden_centreline(attributes):
-                return None, "Underground and culverted centrelines were left out."
-            return int(Habitat.OPEN_WATER), None
+                return None, "Centrelines described as underground, a culvert, or a tunnel were left out."
+            note = OPEN_RIVERS_NOTE if is_fictitious_geometry(attributes) else None
+            return int(Habitat.OPEN_WATER), note
 
         return burn_layer(
             layer, grid, crs, context, code_for_feature, feedback, "Rivers",
