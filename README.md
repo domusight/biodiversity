@@ -64,7 +64,7 @@ Distinctiveness follows the Metric bands (0, 2, 4, 6, 8, divided by 8). Gardens 
 
 ## Run it in QGIS
 
-Copy `qgis/biodiversity_potential` into the QGIS plugins folder, enable **Biodiversity potential**, and open **Urban biodiversity potential** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
+Install `qgis/biodiversity_potential-0.1.0.zip` with **Plugins → Manage and Install Plugins → Install from ZIP**, then enable **Biodiversity potential** and open **Urban biodiversity potential** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
 
 The steps, the parameters, and how to build a floating-point NDVI from Sentinel-2 are in [docs/user-guide.md](docs/user-guide.md). Dataset links and licences are in [docs/data-sources.md](docs/data-sources.md).
 

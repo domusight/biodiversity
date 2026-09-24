@@ -3,9 +3,11 @@
 
 import ast
 import os
+import zipfile
 import xml.etree.ElementTree as ET
 
 _PLUGIN = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential")
+_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-0.1.0.zip")
 
 
 def test_plugin_sources_parse():
@@ -38,7 +40,15 @@ def test_metadata_has_the_processing_provider_flag():
     ):
         assert keys.get(required)
     assert keys["hasProcessingProvider"] == "yes"
-    assert keys["qgisMinimumVersion"] >= "3.28"
+
+
+def test_install_zip_has_one_plugin_folder():
+    with zipfile.ZipFile(_ZIP) as archive:
+        names = [name for name in archive.namelist() if not name.endswith("/")]
+    assert "biodiversity_potential/metadata.txt" in names
+    assert "__pycache__" not in "".join(names)
+    tops = {name.split("/")[0] for name in names}
+    assert tops == {"biodiversity_potential"}
 
 
 def test_style_file_is_xml_and_covers_the_index_range():

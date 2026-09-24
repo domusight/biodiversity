@@ -2,7 +2,11 @@
 
 ## Install
 
-The plugin is the folder `qgis/biodiversity_potential`. Copy that folder, not the whole repository, into the QGIS profile plugins directory.
+The install file is `qgis/biodiversity_potential-0.1.0.zip`. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+
+The zip contains one folder, `biodiversity_potential`, with `metadata.txt` inside it. That is the layout QGIS expects. Rebuild it with `make plugin-zip` after a plugin change.
+
+You can also copy the folder `qgis/biodiversity_potential` itself, not the whole repository, into the QGIS profile plugins directory.
 
 - Linux: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/`
 - macOS: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`

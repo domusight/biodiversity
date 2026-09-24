@@ -6,6 +6,7 @@
 - A city in the map manifest can point `tiles` at a public XYZ URL, including a Cloud Storage bucket, and the glass draws that index when the city is selected.
 - The online map shows a finished index only. City scores are computed offline and uploaded when the run is complete.
 - The magnifying glass is fixed to a 250 m radius, the same circle the QGIS tool scores. The repository is the tool; the page is the precomputed view.
+- `qgis/biodiversity_potential-0.1.0.zip` is the file for QGIS **Install from ZIP**.
 
 ## 0.1.0
 
