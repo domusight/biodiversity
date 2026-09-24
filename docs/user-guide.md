@@ -67,7 +67,7 @@ The public install file is the demo above. It stops at 500 m.
 
 `qgis/biodiversity_potential-city-0.1.0.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area)** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
 
-Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile, then add all of those rasters under **Sentinel-2 NDVI tiles**. Leave the single NDVI slot empty. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
+Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. On the large-area tool the NDVI row is a list, labelled **Sentinel-2 NDVI tiles (select every overlapping tile)**. Use the button beside that row and tick all four. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
 
 ## Prepare a repeatable project
 

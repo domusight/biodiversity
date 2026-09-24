@@ -1,13 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Large-area tool. The public demo does not include this module."""
 
-from qgis.core import (
-    QgsGeometry,
-    QgsProcessing,
-    QgsProcessingException,
-    QgsProcessingParameterMultipleLayers,
-    QgsRectangle,
-)
+from qgis.core import QgsGeometry, QgsProcessingException, QgsRectangle
 
 from .algorithm import BiodiversityPotentialAlgorithm, _OUTPUT_NODATA
 from .burn import create_geotiff, snap_grid, write_array_window
@@ -18,6 +12,7 @@ class LargeAreaAlgorithm(BiodiversityPotentialAlgorithm):
     """Score a city from its boundary. National layers are read, not pre-clipped."""
 
     enforces_demo_limit = False
+    multiple_ndvi = True
 
     def name(self):
         return "urban_biodiversity_potential_large"
@@ -30,22 +25,11 @@ class LargeAreaAlgorithm(BiodiversityPotentialAlgorithm):
             "Scores a whole city or district from a boundary polygon, such as "
             "Greater London. Supply the full input layers. The tool reads only "
             "the features that meet the boundary plus the context buffer, so "
-            "you do not clip the files yourself. Add every overlapping "
-            "Sentinel-2 NDVI tile in Sentinel-2 NDVI tiles. Where the tiles "
-            "cover the same ground, one value is kept and the others fill any "
-            "gaps. The result is one raster of the boundary. The public demo "
-            "is a separate tool and stops at 500 m."
-        )
-
-    def initAlgorithm(self, config=None):
-        super().initAlgorithm(config)
-        self.addParameter(
-            QgsProcessingParameterMultipleLayers(
-                "NDVI_TILES",
-                self.tr("Sentinel-2 NDVI tiles"),
-                layerType=QgsProcessing.TypeRaster,
-                optional=True,
-            )
+            "you do not clip the files yourself. The NDVI input is a list: "
+            "tick every overlapping Sentinel-2 tile. Where the tiles cover "
+            "the same ground, one value is kept and the others fill any gaps. "
+            "The result is one raster of the boundary. The public demo is a "
+            "separate tool and stops at 500 m."
         )
 
     def processAlgorithm(self, parameters, context, feedback):

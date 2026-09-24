@@ -22,6 +22,7 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterField,
     QgsProcessingParameterNumber,
+    QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterRasterDestination,
     QgsProcessingParameterRasterLayer,
     QgsProcessingParameterVectorLayer,
@@ -75,6 +76,7 @@ class _ApplyStyle(QgsProcessingLayerPostProcessorInterface):
 
 class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     enforces_demo_limit = True
+    multiple_ndvi = False
     """Score biodiversity potential on a metre grid inside a small area."""
 
     AOI = "AOI"
@@ -213,13 +215,23 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         self._add_layer(self.ANCIENT, "Ancient woodland")
         self._add_layer(self.SSSI, "Sites of Special Scientific Interest")
         self._add_layer(self.LNR, "Local Nature Reserves")
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(
-                self.NDVI,
-                self.tr("Sentinel-2 NDVI (optional, floating point, about -1 to 1)"),
-                optional=True,
+        if self.multiple_ndvi:
+            self.addParameter(
+                QgsProcessingParameterMultipleLayers(
+                    self.NDVI,
+                    self.tr("Sentinel-2 NDVI tiles (select every overlapping tile)"),
+                    layerType=QgsProcessing.TypeRaster,
+                    optional=True,
+                )
             )
-        )
+        else:
+            self.addParameter(
+                QgsProcessingParameterRasterLayer(
+                    self.NDVI,
+                    self.tr("Sentinel-2 NDVI (optional, floating point, about -1 to 1)"),
+                    optional=True,
+                )
+            )
         self.addParameter(
             QgsProcessingParameterRasterDestination(self.OUTPUT, self.tr("Biodiversity potential"))
         )
@@ -467,15 +479,15 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         return merged
 
     def _ndvi_layers(self, parameters, context):
-        layers = []
+        if self.multiple_ndvi:
+            return [
+                layer for layer in self.parameterAsLayerList(parameters, self.NDVI, context)
+                if layer is not None
+            ]
         single = self.parameterAsRasterLayer(parameters, self.NDVI, context)
-        if single is not None:
-            layers.append(single)
-        if self.parameterDefinition("NDVI_TILES") is not None:
-            for layer in self.parameterAsLayerList(parameters, "NDVI_TILES", context):
-                if layer is not None:
-                    layers.append(layer)
-        return layers
+        if single is None:
+            return []
+        return [single]
 
     def _require_demo_extent(self, geometry):
         centroid = geometry.centroid().asPoint()
