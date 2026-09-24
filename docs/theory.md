@@ -52,7 +52,9 @@ Gardens do not form patches. A garden polygon usually follows a property boundar
 
 ## Habitat amount
 
-Fahrig (2013) argued that the amount of habitat in a local neighbourhood often explains species richness better than the shape and isolation of individual patches. The neighbourhood here is a circle, 250 m by default, the same radius as the area of interest.
+Fahrig (2013) argued that the amount of habitat in a local neighbourhood often explains species richness better than the shape and isolation of individual patches. The neighbourhood here is a circle of 250 m.
+
+That radius is a single scale chosen inside the range where urban insects actually respond, not a dispersal kernel for one species. In one Central European city, flower-rich allotments and cemeteries were beneficial for most wild-bee groups at scales between 200 and 600 m, across radii from 50 to 1,500 m (Weber et al. 2023). 250 m sits inside that band. Mean flights of small solitary bees are about 60–120 m, and those authors suggest keeping flower strips and nesting sites within 150 m (Hofmann, Fleischmann and Renner 2020). Maximum foraging distances of most species run from a few hundred metres upward (Gathmann and Tscharntke 2002; Zurbuchen et al. 2010). Low-mobility garden invertebrates in Basel were related to sealed cover inside 200 m (Braschler et al. 2021). Plants often respond closer to the site than butterflies or birds, which respond further out (Concepción et al. 2015). A 250 m circle sits with the bees and the less mobile invertebrates. It will under-reach birds. The radius is a parameter because of that.
 
 The score is the **mean distinctiveness** of every cell in that circle, not a simple green/not-green fraction. A circle of ancient woodland scores higher than a circle of the same size made of mown grass. Fahrig’s statement was about binary habitat. Weighting by distinctiveness is a deliberate extension, so that a tennis court and a meadow are not treated as the same “green”.
 
@@ -68,7 +70,7 @@ Isolation is scored as a decay with distance to the nearest **source** cell:
 
 A source is structural habitat, or land the user has marked with a designation layer (SSSI or Local Nature Reserve). At the source the score is 1. At 250 m it is 0.5. At 1 km it is about 0.06, which is why the default context buffer is 1 km: a source just outside a 250 m circle still needs to be visible to the calculation.
 
-This is the shape of the incidence function used in metapopulation ecology (Hanski 1999). The 250 m half-distance is a neighbourhood scale for many urban plants and invertebrates, not a measured dispersal kernel for a named species. Birds move further. The half-distance is an advanced parameter because of that.
+This is the shape of the incidence function used in metapopulation ecology (Hanski 1999). The 250 m half-distance is the same neighbourhood as the habitat-amount circle, for the reasons in that section. At four half-distances, 1 km, the function is about 0.06, which is why the context buffer defaults to 1 km. Birds, which respond at larger scales (Concepción et al. 2015), are outside this kernel. The half-distance is a parameter.
 
 An SSSI or Local Nature Reserve is added as a source even where the land-cover layer has called the surface modified grass. Designation boundaries are drawn for a reason, and land cover often misses it. The reverse error also exists: a geological SSSI can include hard standing. The designation does not raise the distinctiveness of those cells. It only marks them as a source, and the log says so.
 
@@ -76,9 +78,9 @@ An SSSI or Local Nature Reserve is added as a source even where the land-cover l
 
 Beninde and colleagues ranked vegetation structure just behind area and corridors. Satellites do not see shrub layers and dead wood. They do see a leaf-area signal. NDVI, (near infrared − red) / (near infrared + red), is the standard one (Pettorelli et al. 2005).
 
-The index treats NDVI below 0.2 as no vegetation structure and NDVI of 0.8 or above as saturated. Between those values the score is linear. A byte image stretched to 0–255 is rejected, because it is not an index.
+The index treats NDVI below 0.2 as no vegetation structure and NDVI of 0.8 or above as saturated. Between those values the score is linear. Carlson and Ripley (1997) scale vegetation cover between a bare-soil NDVI and a dense-canopy NDVI. For Sentinel-2 those ends are taken as 0.2 and 0.8. A byte image stretched to 0–255 is rejected, because it is not an index.
 
-NDVI is a poor description of open water and wetland: clear water is near or below zero even when the habitat is valuable. Those cells receive a fixed structure score of 0.55 instead of the satellite value.
+NDVI is a poor description of open water and wetland: clear water is near or below zero even when the habitat is valuable (Pettorelli et al. 2005). Those cells receive a fixed structure score of 0.55 instead of the satellite value. The 0.55 is the middle of the vegetation scale, so water is not read as bare ground. It is not a measured canopy value.
 
 NDVI also cannot tell a rye-grass playing field from a meadow if both are green, and it saturates in closed canopy. Distinctiveness, from the habitat map, is what separates those cases. The two components are both in the sum for that reason.
 
@@ -107,7 +109,7 @@ Unrecorded land scores 0 and is labelled unrecorded. It is a data gap. There is 
 
 Hill and colleagues (2017) compared 240 urban ponds with 782 ponds outside towns and found the urban ponds held a similar richness of aquatic invertebrates, with more varied communities, not a poorer copy of the rural set. A neighbourhood index that ignored water would miss that.
 
-Distance to the nearest water or wetland cell decays with a 100 m half-distance, shorter than the terrestrial half-distance, because the effect of a pond or a river bank is local. A cell of open water or wetland scores 1.
+Distance to the nearest water or wetland cell decays with a 100 m half-distance. That is shorter than the 250 m terrestrial half-distance on purpose: a pond or a bank is a local effect, and Hill et al. (2017) is about the water body itself, not about a catchment. The 100 m figure is a modelling choice set below the terrestrial neighbourhood. It is not a measured aquatic dispersal distance. A cell of open water or wetland scores 1.
 
 OS Open Rivers is a centreline. The tool buffers it by an assumed width (8 m by default) and thickens it to at least about one cell, so a stream is not lost between the sample points of a 10 m grid. That width is an assumption. Links marked fictitious, or described as underground, a culvert, or a tunnel, are left out. OS Open Map Local `SurfaceWater_Area` and `TidalWater` are the polygons to use.
 
@@ -115,19 +117,19 @@ OS Open Rivers is a centreline. The tool buffers it by an assumed width (8 m by 
 
 MacArthur and MacArthur (1961) showed that the variety of foliage layers helps explain bird diversity. Tews and colleagues (2004) reviewed the wider pattern: habitat heterogeneity often raises animal diversity, and it does so through keystone structures, not through variety for its own sake. It can also fail for habitat specialists.
 
-The component is Shannon evenness of the functional classes in the neighbourhood (everything of distinctiveness 0.35 or above, plus one class for everything else), divided by the logarithm of the number of classes in the scheme. A pure wood scores 0. A wood with water and scrub scores higher. Sealed land and amenity grass sit in the “everything else” class, so a mosaic of roofs and roads does not look diverse.
+The component is Shannon evenness, in Pielou’s form (Pielou 1966), of the functional classes in the neighbourhood (everything of distinctiveness 0.35 or above, plus one class for everything else), divided by the logarithm of the number of classes in the scheme. A pure wood scores 0. A wood with water and scrub scores higher. Sealed land and amenity grass sit in the “everything else” class, so a mosaic of roofs and roads does not look diverse. The 0.35 threshold is the garden score, so a garden counts as habitat structure and a lawn does not (Goddard, Dougill and Benton 2010).
 
 The weight is kept at 0.05 because the effect is real and easy to overstate.
 
 ## Interior
 
-Edge effects are well described (Ries et al. 2004). The score is the distance from a habitat cell to the edge of its patch, divided by 30 m and capped at 1. Thirty metres is a short urban edge depth. Most town patches never develop a core, and the component is there so that a large wood can show one. The weight is 0.03. On the example site the difference between the middle of the wood and its edge is a few points on the 0–100 index. The habitat-amount difference at the edge, where the neighbourhood starts to include the park and the streets, is the larger of the two.
+Edge effects are well described, and the distance they reach is variable (Ries et al. 2004; Harper et al. 2005). Harper and colleagues found that the depth of edge influence in temperate forest is often on the order of tens of metres, and that it is not one number. The score here is the distance from a habitat cell to the edge of its patch, divided by 30 m and capped at 1. Thirty metres is the short end of that range, chosen because most town woods never develop a deep core. The weight is 0.03. On the example site the difference between the middle of the wood and its edge is a few points on the 0–100 index. The habitat-amount difference at the edge, where the neighbourhood starts to include the park and the streets, is the larger of the two.
 
 ## The permeability gate
 
 A weighted sum will let a strong neighbourhood rescue a hostile surface. A sealed cell beside an ancient wood would otherwise outscore a garden in nearby housing, because connectivity and habitat amount would transfer the wood’s context onto the road. McKinney (2002, 2008) treats impervious cover as the consistent negative driver, so the index should do the same.
 
-The four context components — habitat amount, connectivity, water and heterogeneity — are multiplied by a permeability that depends on the surface:
+The four context components — habitat amount, connectivity, water and heterogeneity — are multiplied by a permeability that depends on the surface. McKinney (2002, 2008) supplies the direction of the gate, not the two factors. The factors are set so that a sealed cell cannot overtake a garden: 0.2 leaves a trace of the neighbourhood, and 0.7 discounts modified grass. They are not fitted coefficients.
 
 | Surface | Distinctiveness | Permeability |
 | --- | --- | --- |
@@ -167,4 +169,31 @@ It will not see a green roof, a garden pond or a veteran tree unless a layer the
 
 Patch area is censored at the edge of the context window. A wood that runs for kilometres outside a 1 km buffer is measured only as far as that buffer. The area is then a lower bound. For a 250 m site and a 1 km buffer this rarely binds. It will bind for a strategic map of a whole district, which is a different job.
 
-The weights are a reading of the literature, shared so they can be argued with. They are not calibrated to a local survey. Where a city has one, the advanced weight parameters are there to be changed, and the log records the weights actually used.
+The weights are a reading of the literature, shared so they can be argued with. The order follows Beninde, Veith and Hochkirch (2015). The eight numbers are not estimated from a survey. Where a city has one, the advanced weight parameters are there to be changed, and the log records the weights actually used.
+
+## Where each number comes from
+
+A number in the model is either taken from a cited result or set as a modelling choice and said to be one. The equations are in `docs/method.md`.
+
+| Decision | Value | Source |
+| --- | --- | --- |
+| Cell size | 10 m | Sentinel-2 bands (Drusch et al. 2012) and WorldCover (Zanaga et al. 2022). |
+| Neighbourhood radius | 250 m | Flower-rich allotments and cemeteries benefited most wild-bee groups at scales between 200 and 600 m (Weber et al. 2023). Garden invertebrates in Basel were scored inside 200 m (Braschler et al. 2021). Plants respond closer in, and birds further out (Concepción et al. 2015). |
+| Connectivity half-distance | 250 m | Same neighbourhood. The decay is Hanski’s incidence function (1999). Mean bee flights are shorter and maxima are longer (Gathmann and Tscharntke 2002; Hofmann, Fleischmann and Renner 2020; Zurbuchen et al. 2010). |
+| Context buffer | 1 km | Four connectivity half-distances. The kernel there is about 0.06. |
+| Patch-area reference | 50 ha | Beninde, Veith and Hochkirch (2015): area-sensitive urban species were retained above about this size. Used as the saturation point of the curve. |
+| Species–area exponent | 0.25 | Preston (1962), in the range reviewed from Arrhenius (1921) and MacArthur and Wilson (1967). |
+| Water half-distance | 100 m | Modelling choice, set below the 250 m terrestrial half-distance. Hill et al. (2017) is the reason water is scored. |
+| Interior saturation | 30 m | Short end of temperate forest edge depths, which are variable and often tens of metres (Harper et al. 2005; Ries et al. 2004). |
+| NDVI bare end | 0.2 | Bare-soil end of the vegetation-fraction scale (Carlson and Ripley 1997), applied to Sentinel-2. |
+| NDVI closed-canopy end | 0.8 | Dense-canopy end of that same scale. |
+| Water vegetation score | 0.55 | Modelling choice. NDVI on clear water is near or below zero (Pettorelli et al. 2005), so water is given the middle of the vegetation scale. |
+| Permeability, sealed | 0.2 | Modelling choice. McKinney (2002, 2008) supplies the direction. The factor keeps a trace and stops a road beside a wood outscoring a garden. |
+| Permeability, modified grass | 0.7 | Modelling choice, same gate. |
+| Structural habitat | distinctiveness ≥ 0.40 | Above gardens (0.35) and below allotments (0.45), so lawns and property parcels do not form patches (Goddard, Dougill and Benton 2010) and allotments do (Speak, Mizgajski and Borysiak 2015). |
+| Heterogeneity classes | distinctiveness ≥ 0.35 | The garden score. A garden counts as structure; amenity grass does not. |
+| Distinctiveness bands | 0, 2, 4, 6, 8, divided by 8 | Statutory Biodiversity Metric (Natural England 2023). Gardens and allotments are placed between the low and medium bands (Davies et al. 2009; Goddard, Dougill and Benton 2010; Speak, Mizgajski and Borysiak 2015). Undifferentiated woodland is placed at 0.625, between medium and high, because the open layers do not separate plantation from semi-natural wood. |
+| River width | 8 m | Modelling choice, about one cell. Open Rivers does not carry a width. Underground and culverted links are excluded. |
+| Component weights | 0.22, 0.18, 0.16, 0.14, 0.14, 0.08, 0.05, 0.03 | Order from Beninde, Veith and Hochkirch (2015). The values are a translation of that order, not a fitted model. |
+| Legend breaks | 15, 30, 45, 65 | Round numbers chosen so the example separates sealed land, amenity grass, gardens, allotments and ancient woodland. Not quantiles. |
+| Public demo site cap | 500 m from the site centre | A product limit, so the public tool stays a neighbourhood demonstration. It is not an ecological radius. The neighbourhood stays 250 m. |

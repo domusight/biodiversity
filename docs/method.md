@@ -1,6 +1,6 @@
 # Method
 
-The implementation is `qgis/biodiversity_potential/model.py` and `components.py`. This note is the same calculation in words. If the two disagree, the code and the tests are the source of record.
+The implementation is `qgis/biodiversity_potential/model.py` and `components.py`. This note is the same calculation in words. If the two disagree, the code and the tests are the source of record. The source of each default number is the table in `docs/theory.md`.
 
 ## Grid
 

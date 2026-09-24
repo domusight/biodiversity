@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The method notes now cite a source for each default, including the 250 m neighbourhood. Numbers that are modelling choices are labelled as choices.
+
 - Version 0.2.4 leaves out river centrelines that are underground or culverted. OS Open Rivers marks these links `fictitious`.
 
 - Version 0.2.3 adds **Tidal water** for OS Open Map Local `TidalWater`, beside `SurfaceWater_Area`. Both score as open water.
