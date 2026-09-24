@@ -9,12 +9,13 @@ import numpy as np
 from biodiversity_potential.habitats import Habitat
 
 POTENTIAL_STOPS = (
-    (0.0, (244, 241, 234)),
-    (15.0, (215, 228, 207)),
-    (30.0, (143, 191, 138)),
-    (45.0, (47, 157, 108)),
-    (65.0, (20, 108, 67)),
-    (100.0, (12, 59, 46)),
+    (0.5, (237, 248, 233)),
+    (3.0, (199, 233, 192)),
+    (5.0, (161, 217, 155)),
+    (10.0, (116, 196, 118)),
+    (45.0, (65, 171, 93)),
+    (85.0, (35, 139, 69)),
+    (100.01, (0, 90, 50)),
 )
 
 HABITAT_COLORS = {
@@ -68,10 +69,9 @@ def potential_rgb(index, mask, scale=8):
     finite = np.isfinite(index) & mask
     flat = index[finite]
     painted = np.zeros((flat.size, 3), dtype=np.uint8)
-    for channel in range(3):
-        stops_x = [stop[0] for stop in POTENTIAL_STOPS]
-        stops_y = [stop[1][channel] for stop in POTENTIAL_STOPS]
-        painted[:, channel] = np.interp(flat, stops_x, stops_y).astype(np.uint8)
+    for value, colour in POTENTIAL_STOPS:
+        painted[flat < value] = colour
+        flat = np.where(flat < value, np.inf, flat)
     colours[finite] = painted
     cropped, _bounds = _crop_to_mask(colours, mask, pad=1)
     return _zoom(cropped, scale)

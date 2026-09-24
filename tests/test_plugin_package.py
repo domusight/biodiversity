@@ -7,8 +7,8 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 _PLUGIN = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential")
-_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-0.2.5.zip")
-_CITY_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-city-0.2.5.zip")
+_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-0.2.6.zip")
+_CITY_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-city-0.2.6.zip")
 
 
 def test_plugin_sources_parse():
@@ -41,7 +41,7 @@ def test_metadata_has_the_processing_provider_flag():
     ):
         assert keys.get(required)
     assert keys["hasProcessingProvider"] == "yes"
-    assert keys["version"] == "0.2.5"
+    assert keys["version"] == "0.2.6"
 
 
 def test_install_zip_has_one_plugin_folder():
@@ -72,5 +72,5 @@ def test_style_file_is_xml_and_covers_the_index_range():
     path = os.path.join(_PLUGIN, "style", "biodiversity_potential.qml")
     tree = ET.parse(path)
     values = [item.get("value") for item in tree.iter("item")]
-    assert "0" in values
+    assert "0.5" in values
     assert "100" in values

@@ -199,5 +199,5 @@ A number in the model is either taken from a cited result or set as a modelling 
 | Distinctiveness bands | 0, 2, 4, 6, 8, divided by 8 | Statutory Biodiversity Metric (Natural England 2023). Gardens and allotments are placed between the low and medium bands (Davies et al. 2009; Goddard, Dougill and Benton 2010; Speak, Mizgajski and Borysiak 2015). Undifferentiated woodland is placed at 0.625, between medium and high, because the open layers do not separate plantation from semi-natural wood. |
 | Water-line width | 8 m | Modelling choice, about one cell. `SurfaceWater_Line` has no width. A centreline described as underground, a culvert, or a tunnel is excluded. |
 | Component weights | 0.22, 0.18, 0.16, 0.14, 0.14, 0.08, 0.05, 0.03 | Order from Beninde, Veith and Hochkirch (2015). The values are a translation of that order, not a fitted model. |
-| Legend breaks | 15, 30, 45, 65 | Round numbers chosen so the example separates sealed land, amenity grass, gardens, allotments and ancient woodland. Not quantiles. |
+| Legend breaks | 0.5, 3, 5, 10, 45, 85 | Display bands on a green scale. Each band is one colour. Not quantiles, and not part of the score. |
 | Public demo site cap | 500 m from the site centre | A product limit, so the public tool stays a neighbourhood demonstration. It is not an ecological radius. The neighbourhood stays 250 m. |

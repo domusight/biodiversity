@@ -65,11 +65,13 @@
   }
 
   function indexClass(score) {
-    if (score < 15) return "Low";
-    if (score < 30) return "Limited";
-    if (score < 45) return "Moderate";
-    if (score < 65) return "High";
-    return "Very high";
+    if (score < 0.5) return "0–0.5";
+    if (score < 3) return "0.5–3";
+    if (score < 5) return "3–5";
+    if (score < 10) return "5–10";
+    if (score < 45) return "10–45";
+    if (score < 85) return "45–85";
+    return "85–100";
   }
 
   function sampleScore(latitude, longitude) {

@@ -16,18 +16,18 @@ The picture below is a synthetic site, [Riverside Quarter](examples/riverside_qu
 
 | Place | Index | Class |
 | --- | ---: | --- |
-| Ancient wood, interior | 87 | Very high |
-| Ancient wood, edge | 84 | Very high |
-| Reedbed in the wood | 80 | Very high |
-| Pond | 60 | High |
-| Copse in the park | 57 | High |
-| Allotments | 55 | High |
-| Garden beside the wood | 40 | Moderate |
-| Park grassland | 25 | Limited |
-| Garden in the southern housing | 20 | Limited |
-| Playing field | 17 | Limited |
-| Sealed street beside the wood | 6 | Low |
-| Sealed street in the south | 3 | Low |
+| Ancient wood, interior | 87 | 85–100 |
+| Ancient wood, edge | 84 | 45–85 |
+| Reedbed in the wood | 80 | 45–85 |
+| Pond | 60 | 45–85 |
+| Copse in the park | 57 | 45–85 |
+| Allotments | 55 | 45–85 |
+| Garden beside the wood | 40 | 10–45 |
+| Park grassland | 25 | 10–45 |
+| Garden in the southern housing | 20 | 10–45 |
+| Playing field | 17 | 10–45 |
+| Sealed street beside the wood | 6 | 5–10 |
+| Sealed street in the south | 3 | 0.5–3 |
 
 The same garden scores 40 beside the wood and 20 in the housing. The street beside the wood stays at 6. Patch size, habitat quality and vegetation do the heavy lifting. Neighbourhood context moves a surface up or down, and a permeability gate stops sealed land from inheriting the score of the habitat next to it.
 
@@ -35,7 +35,7 @@ The full component table, and the checks that keep these ranks stable, are in th
 
 ## Two ways to see it
 
-The public tool runs on a site within 500 m of its centre. Each cell is still scored from a 250 m neighbourhood. A second install file, `qgis/biodiversity_potential-city-0.2.5.zip`, scores a whole boundary such as Greater London from the same index. Give it the boundary and the full input layers. It clips them itself.
+The public tool runs on a site within 500 m of its centre. Each cell is still scored from a 250 m neighbourhood. A second install file, `qgis/biodiversity_potential-city-0.2.6.zip`, scores a whole boundary such as Greater London from the same index. Give it the boundary and the full input layers. It clips them itself.
 
 [web/index.html](web/index.html) is the public map. A magnifying glass follows the pointer and shows a finished index inside that same 250 m radius. Scroll the city and the lens stays at that scale. The page does not score anything while someone looks at it. Riverside Quarter is the worked example. London, Birmingham, Manchester and Leeds are shown after their indexes have been computed offline and uploaded to a Cloud Storage bucket. Details are in [web/README.md](web/README.md).
 
@@ -64,7 +64,7 @@ Distinctiveness follows the Metric bands (0, 2, 4, 6, 8, divided by 8). Gardens 
 
 ## Run it in QGIS
 
-Install `qgis/biodiversity_potential-0.2.5.zip` with **Plugins → Manage and Install Plugins → Install from ZIP**, then enable **Biodiversity potential** and open **Urban biodiversity potential** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
+Install `qgis/biodiversity_potential-0.2.6.zip` with **Plugins → Manage and Install Plugins → Install from ZIP**, then enable **Biodiversity potential** and open **Urban biodiversity potential** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
 
 The steps, the parameters, and how to build a floating-point NDVI from Sentinel-2 are in [docs/user-guide.md](docs/user-guide.md). Dataset links and licences are in [docs/data-sources.md](docs/data-sources.md).
 

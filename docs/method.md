@@ -105,17 +105,19 @@ The denominator drops a component only when its weight is zero or, for vegetatio
 
 ## Legend
 
-The colour ramp is fixed, so two places can be compared. The breaks are round numbers on the 0–100 index, not quantiles of one site.
+The colour ramp is a fixed green scale, so two places can be compared. Each band is one colour. The breaks are 0.5, 3, 5, 10, 45 and 85.
 
-| Index | Class |
+| Index | Colour |
 | --- | --- |
-| 0–15 | Low |
-| 15–30 | Limited |
-| 30–45 | Moderate |
-| 45–65 | High |
-| 65–100 | Very high |
+| 0–0.5 | `#edf8e9` |
+| 0.5–3 | `#c7e9c0` |
+| 3–5 | `#a1d99b` |
+| 5–10 | `#74c476` |
+| 10–45 | `#41ab5d` |
+| 45–85 | `#238b45` |
+| 85–100 | `#005a32` |
 
-On the synthetic example these breaks separate sealed streets, amenity grassland, gardens, allotments and the ancient wood. A site with no semi-natural habitat will sit in the lower classes. That is the finding, not a reason to stretch the ramp.
+The bands are a display choice. They do not change the 0–100 score.
 
 ## Outputs
 

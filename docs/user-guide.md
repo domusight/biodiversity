@@ -2,7 +2,7 @@
 
 ## Install
 
-The public install file is `qgis/biodiversity_potential-0.2.5.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.2.5.zip`. Version 0.2.5 is shown on the large-area tool name. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+The public install file is `qgis/biodiversity_potential-0.2.6.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.2.6.zip`. Version 0.2.6 is shown on the large-area tool name. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
 
 Download the zip itself. On GitHub, open the file and use **Download raw file**. A page saved from the browser is HTML, and QGIS then reports that the file is not a zip. The city zip is about 31 KB and begins with the characters `PK`.
 
@@ -47,13 +47,15 @@ Context buffer, the two half-distances, the interior distance, the 50 ha referen
 
 The layer is 0–100. The style file is copied beside the GeoTIFF and applied when QGIS loads the result.
 
-| Colour, from pale to dark green | Index | Class |
-| --- | --- | --- |
-| Pale | 0–15 | Low |
-| | 15–30 | Limited |
-| | 30–45 | Moderate |
-| | 45–65 | High |
-| Dark | 65–100 | Very high |
+| Colour, pale green to dark green | Index |
+| --- | --- |
+| `#edf8e9` | 0–0.5 |
+| `#c7e9c0` | 0.5–3 |
+| `#a1d99b` | 3–5 |
+| `#74c476` | 5–10 |
+| `#41ab5d` | 10–45 |
+| `#238b45` | 45–85 |
+| `#005a32` | 85–100 |
 
 Dark green is where several of the strong components coincide: a large, distinctive, well-vegetated patch. Pale is sealed or unrecorded land, including where that land sits near better habitat. A sealed cell keeps only a fifth of the neighbourhood score, so a road does not turn dark green because a wood is next to it.
 
@@ -65,9 +67,9 @@ The optional cell polygons carry the same numbers as attributes, for the identif
 
 The public install file is the demo above. It stops at 500 m.
 
-`qgis/biodiversity_potential-city-0.2.5.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area) 0.2.5** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. Put OS Open Map Local `SurfaceWater_Line` in **Surface water lines**, and leave **River centrelines** empty. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
+`qgis/biodiversity_potential-city-0.2.6.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area) 0.2.6** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. Put OS Open Map Local `SurfaceWater_Line` in **Surface water lines**, and leave **River centrelines** empty. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
 
-Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. Version 0.2.5 has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
+Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. Version 0.2.6 has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
 
 ## Prepare a repeatable project
 

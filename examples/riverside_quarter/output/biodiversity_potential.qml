@@ -15,17 +15,18 @@
         <stdDevFactor>2</stdDevFactor>
       </minMaxOrigin>
       <rastershader>
-        <colorrampshader minimumValue="0" maximumValue="100" colorRampType="INTERPOLATED" classificationMode="1" clip="0">
+        <colorrampshader minimumValue="0" maximumValue="100" colorRampType="DISCRETE" classificationMode="1" clip="0">
           <colorramp type="gradient" name="[source]">
-            <Option type="QString" name="color1" value="244,241,234,255"/>
-            <Option type="QString" name="color2" value="12,59,46,255"/>
+            <Option type="QString" name="color1" value="237,248,233,255"/>
+            <Option type="QString" name="color2" value="0,90,50,255"/>
           </colorramp>
-          <item alpha="255" value="0" label="0 Low" color="#f4f1ea"/>
-          <item alpha="255" value="15" label="15 Limited" color="#d7e4cf"/>
-          <item alpha="255" value="30" label="30 Moderate" color="#8fbf8a"/>
-          <item alpha="255" value="45" label="45 High" color="#2f9d6c"/>
-          <item alpha="255" value="65" label="65 Very high" color="#146c43"/>
-          <item alpha="255" value="100" label="100" color="#0c3b2e"/>
+          <item alpha="255" value="0.5" label="0–0.5" color="#edf8e9"/>
+          <item alpha="255" value="3" label="0.5–3" color="#c7e9c0"/>
+          <item alpha="255" value="5" label="3–5" color="#a1d99b"/>
+          <item alpha="255" value="10" label="5–10" color="#74c476"/>
+          <item alpha="255" value="45" label="10–45" color="#41ab5d"/>
+          <item alpha="255" value="85" label="45–85" color="#238b45"/>
+          <item alpha="255" value="100" label="85–100" color="#005a32"/>
         </colorrampshader>
       </rastershader>
     </rasterrenderer>

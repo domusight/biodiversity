@@ -36,19 +36,19 @@ Context components are shown after the permeability gate, which is how they ente
 
 | Place | Index | Class | Distinctiveness | Patch area | Habitat amount | Connectivity | Vegetation | Water | Heterogeneity | Interior |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Ancient wood, interior | 87.16 | Very high | 1.00 | 0.94 | 0.61 | 1.00 | 1.00 | 0.75 | 0.50 | 1.00 |
-| Ancient wood, edge | 83.65 | Very high | 1.00 | 0.94 | 0.42 | 1.00 | 1.00 | 0.91 | 0.54 | 0.47 |
-| Reedbed clearing | 79.68 | Very high | 0.75 | 0.94 | 0.61 | 1.00 | 0.55 | 1.00 | 0.54 | 1.00 |
-| Pond | 59.87 | High | 0.50 | 0.29 | 0.50 | 1.00 | 0.55 | 1.00 | 0.54 | 1.00 |
-| Copse in the park | 56.87 | High | 0.62 | 0.36 | 0.20 | 1.00 | 1.00 | 0.25 | 0.35 | 1.00 |
-| Allotments | 55.36 | High | 0.45 | 0.40 | 0.30 | 1.00 | 0.73 | 0.45 | 0.41 | 1.00 |
-| Street trees | 45.46 | High | 0.50 | 0.29 | 0.11 | 1.00 | 0.70 | 0.15 | 0.20 | 0.67 |
-| Garden beside the wood | 40.25 | Moderate | 0.35 | 0 | 0.47 | 0.90 | 0.33 | 0.66 | 0.54 | 0 |
-| Park grassland | 24.74 | Limited | 0.25 | 0 | 0.13 | 0.64 | 0.43 | 0.17 | 0.24 | 0 |
-| Garden in the south | 19.96 | Limited | 0.35 | 0 | 0.06 | 0.50 | 0.33 | 0.11 | 0.08 | 0 |
-| Playing field | 16.78 | Limited | 0.25 | 0 | 0.12 | 0.46 | 0.07 | 0.19 | 0.24 | 0 |
-| Sealed, beside the wood | 5.63 | Low | 0 | 0 | 0.07 | 0.17 | 0 | 0.12 | 0.11 | 0 |
-| Sealed, south | 2.56 | Low | 0 | 0 | 0.01 | 0.12 | 0 | 0.03 | 0.03 | 0 |
+| Ancient wood, interior | 87.16 | 85–100 | 1.00 | 0.94 | 0.61 | 1.00 | 1.00 | 0.75 | 0.50 | 1.00 |
+| Ancient wood, edge | 83.65 | 45–85 | 1.00 | 0.94 | 0.42 | 1.00 | 1.00 | 0.91 | 0.54 | 0.47 |
+| Reedbed clearing | 79.68 | 45–85 | 0.75 | 0.94 | 0.61 | 1.00 | 0.55 | 1.00 | 0.54 | 1.00 |
+| Pond | 59.87 | 45–85 | 0.50 | 0.29 | 0.50 | 1.00 | 0.55 | 1.00 | 0.54 | 1.00 |
+| Copse in the park | 56.87 | 45–85 | 0.62 | 0.36 | 0.20 | 1.00 | 1.00 | 0.25 | 0.35 | 1.00 |
+| Allotments | 55.36 | 45–85 | 0.45 | 0.40 | 0.30 | 1.00 | 0.73 | 0.45 | 0.41 | 1.00 |
+| Street trees | 45.46 | 45–85 | 0.50 | 0.29 | 0.11 | 1.00 | 0.70 | 0.15 | 0.20 | 0.67 |
+| Garden beside the wood | 40.25 | 10–45 | 0.35 | 0 | 0.47 | 0.90 | 0.33 | 0.66 | 0.54 | 0 |
+| Park grassland | 24.74 | 10–45 | 0.25 | 0 | 0.13 | 0.64 | 0.43 | 0.17 | 0.24 | 0 |
+| Garden in the south | 19.96 | 10–45 | 0.35 | 0 | 0.06 | 0.50 | 0.33 | 0.11 | 0.08 | 0 |
+| Playing field | 16.78 | 10–45 | 0.25 | 0 | 0.12 | 0.46 | 0.07 | 0.19 | 0.24 | 0 |
+| Sealed, beside the wood | 5.63 | 5–10 | 0 | 0 | 0.07 | 0.17 | 0 | 0.12 | 0.11 | 0 |
+| Sealed, south | 2.56 | 0.5–3 | 0 | 0 | 0.01 | 0.12 | 0 | 0.03 | 0.03 | 0 |
 
 Across the circle the index runs from 2.1 to 90.8, with a mean of 31.1.
 

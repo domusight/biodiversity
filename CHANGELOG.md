@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The legend is a green scale with bands at 0.5, 3, 5, 10, 45 and 85. Each band is one colour. The score is unchanged.
+
 - Version 0.2.5 adds **Surface water lines** for OS Open Map Local `SurfaceWater_Line`, the streams too narrow to appear in `SurfaceWater_Area`. Leave river centrelines empty. On OS Open Rivers, `fictitious` means a straight line, not a culvert.
 
 - The method notes now cite a source for each default, including the 250 m neighbourhood. Numbers that are modelling choices are labelled as choices.
