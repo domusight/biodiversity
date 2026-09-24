@@ -2,7 +2,7 @@
 
 ## Install
 
-The public install file is `qgis/biodiversity_potential-0.2.0.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.2.0.zip`. Version 0.2.0 is shown on the large-area tool name. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+The public install file is `qgis/biodiversity_potential-0.2.1.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.2.1.zip`. Version 0.2.1 is shown on the large-area tool name. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
 
 Download the zip itself. On GitHub, open the file and use **Download raw file**. A page saved from the browser is HTML, and QGIS then reports that the file is not a zip. The city zip is about 31 KB and begins with the characters `PK`.
 
@@ -65,9 +65,9 @@ The optional cell polygons carry the same numbers as attributes, for the identif
 
 The public install file is the demo above. It stops at 500 m.
 
-`qgis/biodiversity_potential-city-0.2.0.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area) 0.2.0** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
+`qgis/biodiversity_potential-city-0.2.1.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area) 0.2.1** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
 
-Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. Version 0.2.0 has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
+Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. Version 0.2.1 has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
 
 ## Prepare a repeatable project
 
