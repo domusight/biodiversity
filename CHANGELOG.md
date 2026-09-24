@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The QGIS demo refuses a site that extends more than 500 m from its centre. The neighbourhood stays 250 m. A city is the same index, run offline.
 - Leaflet map with a magnifying glass. The glass follows the pointer and shows biodiversity potential at a closer zoom than the basemap. The published layer is the Riverside Quarter example.
 - A city in the map manifest can point `tiles` at a public XYZ URL, including a Cloud Storage bucket, and the glass draws that index when the city is selected.
 - The online map shows a finished index only. City scores are computed offline and uploaded when the run is complete.

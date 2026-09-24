@@ -33,6 +33,7 @@ from qgis.core import (
 from .burn import burn_geometry, burn_layer, sample_raster, snap_grid, write_geotiff
 from .crosswalk import SCHEME_ESA, SCHEME_KEYWORD, SCHEME_PRIORITY, combine_habitat_layers, map_priority_habitat, map_value
 from .habitats import Habitat, label
+from .limits import DEMO_RADIUS_M, farthest_from_point, within_demo_radius
 from .model import COMPONENT_ORDER, Weights, ModelConfig, run_model
 
 _STYLE = os.path.join(os.path.dirname(__file__), "style", "biodiversity_potential.qml")
@@ -129,8 +130,9 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         return self.tr(
-            "Scores the biodiversity potential of each 10 m cell in a small area, "
-            "by default a 250 m radius. The score is a 0–100 index built from "
+            "Scores the biodiversity potential of each 10 m cell in a small area. "
+            "This demo accepts a site within 500 m of its centre. "
+            "Each cell still looks 250 m around itself. The score is a 0–100 index built from "
             "patch area, local habitat amount, connectivity, vegetation, "
             "distinctiveness, water, heterogeneity and interior habitat.\n\n"
             "It is a screening map for where potential sits. It is not a species "
@@ -163,6 +165,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=250.0,
                 minValue=10.0,
+                maxValue=DEMO_RADIUS_M,
             )
         )
         self.addParameter(
@@ -182,6 +185,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=250.0,
                 minValue=10.0,
+                maxValue=DEMO_RADIUS_M,
             )
         )
         self._add_layer(self.BASE, "Base land cover (wall to wall)")
@@ -265,6 +269,8 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
 
         cell = self.parameterAsDouble(parameters, self.CELL, context)
         neighbourhood = self.parameterAsDouble(parameters, self.NEIGHBOURHOOD, context)
+        if neighbourhood > DEMO_RADIUS_M:
+            raise QgsProcessingException(self._demo_limit_message(neighbourhood))
         context_buffer = self.parameterAsDouble(parameters, self.CONTEXT, context)
         if context_buffer < neighbourhood:
             feedback.pushWarning(
@@ -272,7 +278,11 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             )
             context_buffer = neighbourhood
 
-        aoi = self._aoi_geometry(aoi_layer, self.parameterAsDouble(parameters, self.RADIUS, context))
+        radius = self.parameterAsDouble(parameters, self.RADIUS, context)
+        if radius > DEMO_RADIUS_M:
+            raise QgsProcessingException(self._demo_limit_message(radius))
+        aoi = self._aoi_geometry(aoi_layer, radius)
+        self._require_demo_extent(aoi)
         buffered = QgsGeometry(aoi).buffer(context_buffer, 24)
         grid = snap_grid(buffered.boundingBox(), cell)
         feedback.pushInfo(
@@ -447,6 +457,24 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         if merged is None or merged.isEmpty() or merged.area() <= 0:
             raise QgsProcessingException("The area of interest has no area.")
         return merged
+
+    def _require_demo_extent(self, geometry):
+        centroid = geometry.centroid().asPoint()
+        xs = []
+        ys = []
+        for vertex in geometry.vertices():
+            xs.append(vertex.x())
+            ys.append(vertex.y())
+        if not within_demo_radius(xs, ys, centroid.x(), centroid.y()):
+            reached = farthest_from_point(xs, ys, centroid.x(), centroid.y())
+            raise QgsProcessingException(self._demo_limit_message(reached))
+
+    def _demo_limit_message(self, reached_m):
+        return (
+            "This demo scores a site within {0:.0f} m of its centre. "
+            "This one reaches {1:.0f} m. London and the other cities use the same index, "
+            "computed offline for the whole city and published on the map."
+        ).format(DEMO_RADIUS_M, reached_m)
 
     def _require_metres(self, crs):
         if not isinstance(crs, QgsCoordinateReferenceSystem) or not crs.isValid():

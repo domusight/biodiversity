@@ -1,7 +1,7 @@
 [general]
 name=Biodiversity potential
 qgisMinimumVersion=3.28
-description=Screen a small urban area for biodiversity potential from open habitat, designation and satellite data.
+description=Screen one urban site, within 500 m of its centre, for biodiversity potential from open habitat, designation and satellite data.
 version=0.1.0
 author=Domusight
 email=domusight@users.noreply.github.com

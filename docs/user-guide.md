@@ -18,7 +18,7 @@ QGIS 3.28 or later. The area of interest must be in a projected CRS with metre u
 
 ## Run
 
-1. Put the area in as a polygon, or as a point. Points are buffered by the radius, default 250 m.
+1. Put the area in as a polygon, or as a point. Points are buffered by the radius, default 250 m. The site must lie within 500 m of its centre. A larger polygon is refused. This copy is a proof-of-concept demo of one neighbourhood, not a city run.
 2. Add whatever of the following you have. One habitat layer is the minimum. The useful set is a wall-to-wall base, OS Open Greenspace, a woodland overlay, surface water or rivers, the Priority Habitat Inventory, and Ancient Woodland.
 3. Optionally add a single-band NDVI raster. See `docs/data-sources.md` for how to calculate it.
 4. Run. The log prints the weights, the number of features used, any class names the crosswalk did not recognise, and the count of cells in each legend class.
@@ -29,9 +29,9 @@ The tool builds a grid over the area plus a context buffer (1 km by default), sc
 
 | Parameter | Default | Meaning |
 | --- | --- | --- |
-| Buffer radius for points | 250 m | Ignored when the area is already a polygon. |
+| Buffer radius for points | 250 m, maximum 500 m | Ignored when the area is already a polygon. The polygon must still fit inside 500 m of its centre. |
 | Cell size | 10 m | Matches Sentinel-2 and WorldCover. |
-| Neighbourhood radius | 250 m | Circle used for habitat amount and heterogeneity. |
+| Neighbourhood radius | 250 m, maximum 500 m | Circle used for habitat amount and heterogeneity. |
 | Base classification | ESA WorldCover | Or keyword labels, habitat codes, greenspace functions, priority-habitat names. |
 | Greenspace function field | choose `function` | OS Open Greenspace. |
 | Assumed river width | 8 m | Centreline buffer. Narrower lines are thickened to about one cell so they are not missed. |
@@ -58,6 +58,12 @@ Dark green is where several of the strong components coincide: a large, distinct
 Turn on the optional component raster to see which term produced a score. The bands are distinctiveness, patch area, habitat amount, connectivity, vegetation, blue, heterogeneity, interior. They are 0–1, and the four neighbourhood bands are already multiplied by surface permeability.
 
 The optional cell polygons carry the same numbers as attributes, for the identify tool. Leave them off on anything larger than a neighbourhood. Above 250,000 cells they are skipped.
+
+## A whole city
+
+London is the same index. There is no second tool and no second formula. The plugin stops at 500 m so the copy you give away stays a neighbourhood demo.
+
+A city run uses the same inputs, clipped to the city plus at least 1 km, and the same weights. Score it in tiles of a few kilometres, each with the 1 km context, then mosaic the index rasters. Colour the mosaic with `style/biodiversity_potential.qml`, cut XYZ tiles, and upload them to the Cloud Storage bucket named in `web/README.md`. The page only displays that finished layer.
 
 ## Prepare a repeatable project
 

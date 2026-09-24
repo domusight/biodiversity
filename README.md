@@ -35,7 +35,7 @@ The full component table, and the checks that keep these ranks stable, are in th
 
 ## Two ways to see it
 
-The repository is the QGIS tool. Anyone can run it on a 250 m circle of their own.
+The repository is the QGIS tool. Anyone can run it on a site within 500 m of its centre. Each cell is still scored from a 250 m neighbourhood. A whole city is the same index, computed offline and shown on the map.
 
 [web/index.html](web/index.html) is the public map. A magnifying glass follows the pointer and shows a finished index inside that same 250 m radius. Scroll the city and the lens stays at that scale. The page does not score anything while someone looks at it. Riverside Quarter is the worked example. London, Birmingham, Manchester and Leeds are shown after their indexes have been computed offline and uploaded to a Cloud Storage bucket. Details are in [web/README.md](web/README.md).
 
