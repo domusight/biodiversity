@@ -147,10 +147,11 @@ The model never sees a file format. It sees a habitat grid, an optional NDVI gri
 | --- | --- | --- |
 | 1 | Wall-to-wall land cover, often ESA WorldCover | Fills every cell. In towns, WorldCover grassland is read as amenity grass, because the class mixes pasture and lawns. Priority habitat later corrects real meadows. |
 | 2 | OS Open Greenspace | Re-labels public parks, allotments, cemeteries and tennis courts. A park is amenity grass until a woodland polygon says otherwise. |
-| 3 | Local habitat overlay | OS Zoomstack woodland, National Forest Inventory, or a Phase 1 or UKHab export. This is how a copse inside a park becomes woodland. |
-| 4 | Surface water, then river centrelines | Open water. |
-| 5 | Priority Habitat Inventory | High distinctiveness. Bogs and limestone pavement are treated as irreplaceable. Ponds and lakes become priority water. Names the list does not recognise still score as priority habitat, and the log says so. |
-| 6 | Ancient woodland | Very high distinctiveness. Where a county has a revised Ancient Woodland Inventory, that revision should be used for the county. |
+| 3 | Woodland polygons | OS Zoomstack `woodland`, or any polygon layer of ordinary woods. Ancient woodland still overwrites these. |
+| 4 | Local habitat overlay | A Phase 1 or UKHab export, where it is more detailed than the woodland polygons. |
+| 5 | Surface water, then river centrelines | Open water. |
+| 6 | Priority Habitat Inventory | High distinctiveness. Bogs and limestone pavement are treated as irreplaceable. Ponds and lakes become priority water. Names the list does not recognise still score as priority habitat, and the log says so. |
+| 7 | Ancient woodland | Very high distinctiveness. Where a county has a revised Ancient Woodland Inventory, that revision should be used for the county. |
 
 SSSI and Local Nature Reserve polygons do not paint a habitat class. They add connectivity sources.
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Version 0.2.2 adds **Woodland polygons** for ordinary woods, such as OS Open Zoomstack `woodland`. Ancient woodland still overwrites those polygons.
+
 - Version 0.2.1. Opening the large-area tool no longer shows the 500 m demo dialog. The toolbox name is **Urban biodiversity potential (large area) 0.2.1**.
 
 - Version 0.2.0. The large-area tool is named **Urban biodiversity potential (large area) 0.2.0** and has four NDVI file rows, tile 1 to tile 4. The install file is `qgis/biodiversity_potential-city-0.2.0.zip`.

@@ -87,6 +87,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     BASE_SCHEME = "BASE_SCHEME"
     GREENSPACE = "GREENSPACE"
     GREENSPACE_FIELD = "GREENSPACE_FIELD"
+    WOODLAND = "WOODLAND"
     OVERLAY = "OVERLAY"
     OVERLAY_FIELD = "OVERLAY_FIELD"
     OVERLAY_SCHEME = "OVERLAY_SCHEME"
@@ -199,6 +200,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         self._add_scheme(self.BASE_SCHEME, "Base classification", default=0)
         self._add_layer(self.GREENSPACE, "OS Open Greenspace")
         self._add_field(self.GREENSPACE_FIELD, "Greenspace function field", self.GREENSPACE)
+        self._add_layer(self.WOODLAND, "Woodland polygons (OS Zoomstack woodland)")
         self._add_layer(self.OVERLAY, "Local habitat overlay (woodland, UKHab, Phase 1)")
         self._add_field(self.OVERLAY_FIELD, "Overlay class field", self.OVERLAY)
         self._add_scheme(self.OVERLAY_SCHEME, "Overlay classification", default=1)
@@ -372,6 +374,14 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                     self._burn_fixed_scheme(
                         greenspace, grid, target_crs, context, feedback,
                         self.GREENSPACE_FIELD, parameters, "os_greenspace", "OS Open Greenspace", False,
+                    )
+                )
+            woodland = self.parameterAsVectorLayer(parameters, self.WOODLAND, context)
+            if woodland is not None:
+                layers.append(
+                    self._burn_constant(
+                        woodland, grid, target_crs, context, feedback,
+                        int(Habitat.WOODLAND), "Woodland", False, 0.0,
                     )
                 )
             overlay = self.parameterAsVectorLayer(parameters, self.OVERLAY, context)

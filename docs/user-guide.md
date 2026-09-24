@@ -2,7 +2,7 @@
 
 ## Install
 
-The public install file is `qgis/biodiversity_potential-0.2.1.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.2.1.zip`. Version 0.2.1 is shown on the large-area tool name. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+The public install file is `qgis/biodiversity_potential-0.2.2.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.2.2.zip`. Version 0.2.2 is shown on the large-area tool name. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
 
 Download the zip itself. On GitHub, open the file and use **Download raw file**. A page saved from the browser is HTML, and QGIS then reports that the file is not a zip. The city zip is about 31 KB and begins with the characters `PK`.
 
@@ -21,7 +21,7 @@ QGIS 3.28 or later. The area of interest must be in a projected CRS with metre u
 ## Run
 
 1. Put the area in as a polygon, or as a point. Points are buffered by the radius, default 250 m. The site must lie within 500 m of its centre. A larger polygon is refused. This copy is a proof-of-concept demo of one neighbourhood, not a city run.
-2. Add whatever of the following you have. One habitat layer is the minimum. The useful set is a wall-to-wall base, OS Open Greenspace, a woodland overlay, surface water or rivers, the Priority Habitat Inventory, and Ancient Woodland.
+2. Add whatever of the following you have. One habitat layer is the minimum. The useful set is a wall-to-wall base, OS Open Greenspace, woodland polygons, surface water, the Priority Habitat Inventory, and Ancient Woodland.
 3. Optionally add a single-band NDVI raster. See `docs/data-sources.md` for how to calculate it.
 4. Run. The log prints the weights, the number of features used, any class names the crosswalk did not recognise, and the count of cells in each legend class.
 
@@ -65,9 +65,9 @@ The optional cell polygons carry the same numbers as attributes, for the identif
 
 The public install file is the demo above. It stops at 500 m.
 
-`qgis/biodiversity_potential-city-0.2.1.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area) 0.2.1** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
+`qgis/biodiversity_potential-city-0.2.2.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area) 0.2.2** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
 
-Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. Version 0.2.1 has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
+Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. Version 0.2.2 has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
 
 ## Prepare a repeatable project
 

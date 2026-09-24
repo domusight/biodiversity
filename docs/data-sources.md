@@ -11,7 +11,7 @@ Absence in these inventories is not evidence that habitat is absent. The Priorit
 | Dataset | Use in the tool | Licence and where to get it |
 | --- | --- | --- |
 | ESA WorldCover 10 m v200 | Base land cover. Class 10 woodland, 20 scrub, 30 amenity grass (an urban reading of the grassland class), 40 cultivated, 50 sealed, 80 water, 90 wetland. | CC BY 4.0. [esa-worldcover.org](https://esa-worldcover.org/). Cite Zanaga et al. (2022), doi:10.5281/zenodo.7254221. |
-| OS Open Zoomstack | Woodland and surface water as overlays. Buildings can be a keyword base if you accept that everything else stays unrecorded. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenZoomstack). |
+| OS Open Zoomstack | Layer `woodland` in **Woodland polygons**. Layer `surfacewater` in **Surface water polygons**. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenZoomstack). |
 | OS Open Greenspace | Public parks, playing fields, allotments, cemeteries, religious grounds, golf courses, play space, sports facilities, tennis courts. Field `function`. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenGreenspace). Code list: [FunctionValue](https://docs.os.uk/os-downloads/products/land-and-terrain-portfolio/os-open-greenspace/os-open-greenspace-technical-specification/code-lists/functionvalue). |
 | OS Open Rivers | River centrelines. Buffered by the assumed width, default 8 m. | Open Government Licence. [OS Data Hub](https://osdatahub.os.uk/downloads/open/OpenRivers). |
 | National Forest Inventory | Optional woodland overlay. Keyword scheme. | Open Government Licence. Forestry Commission / Forestry England open data. |
