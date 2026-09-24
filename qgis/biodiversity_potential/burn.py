@@ -16,6 +16,8 @@ from qgis.core import (
     QgsWkbTypes,
 )
 
+from .mosaic import mosaic_first_valid
+
 NODATA = -999
 
 
@@ -149,6 +151,18 @@ def sample_raster(layer, grid, target_crs):
         array[np.isclose(array, nodata)] = np.nan
     dataset = None
     return array
+
+
+def sample_rasters(layers, grid, target_crs):
+    """Warp overlapping single-band rasters onto the grid and mosaic them."""
+    arrays = []
+    for layer in layers:
+        if layer is None:
+            continue
+        arrays.append(sample_raster(layer, grid, target_crs))
+    if not arrays:
+        return None
+    return mosaic_first_valid(arrays)
 
 
 def write_geotiff(path, array, grid, crs_wkt, nodata, descriptions):

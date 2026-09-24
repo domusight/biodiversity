@@ -30,7 +30,7 @@ from qgis.core import (
     QgsWkbTypes,
 )
 
-from .burn import burn_geometry, burn_layer, sample_raster, snap_grid, write_geotiff
+from .burn import burn_geometry, burn_layer, sample_rasters, snap_grid, write_geotiff
 from .crosswalk import SCHEME_ESA, SCHEME_KEYWORD, SCHEME_PRIORITY, combine_habitat_layers, map_priority_habitat, map_value
 from .habitats import Habitat, label
 from .limits import DEMO_RADIUS_M, farthest_from_point, within_demo_radius
@@ -423,10 +423,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                     "No cells fall inside the area of interest. Check the radius and cell size."
                 )
 
-            ndvi = None
-            ndvi_layer = self.parameterAsRasterLayer(parameters, self.NDVI, context)
-            if ndvi_layer is not None:
-                ndvi = sample_raster(ndvi_layer, grid, target_crs)
+            ndvi = sample_rasters(self._ndvi_layers(parameters, context), grid, target_crs)
 
             weights = self._weights(parameters, context, feedback)
             config = ModelConfig(
@@ -468,6 +465,17 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         if merged is None or merged.isEmpty() or merged.area() <= 0:
             raise QgsProcessingException("The area of interest has no area.")
         return merged
+
+    def _ndvi_layers(self, parameters, context):
+        layers = []
+        single = self.parameterAsRasterLayer(parameters, self.NDVI, context)
+        if single is not None:
+            layers.append(single)
+        if self.parameterDefinition("NDVI_TILES") is not None:
+            for layer in self.parameterAsLayerList(parameters, "NDVI_TILES", context):
+                if layer is not None:
+                    layers.append(layer)
+        return layers
 
     def _require_demo_extent(self, geometry):
         centroid = geometry.centroid().asPoint()
