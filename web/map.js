@@ -98,9 +98,17 @@
     return best;
   }
 
-  function glassZoom() {
-    var offset = glass.options.zoomOffset;
-    return Math.min(map.getMaxZoom(), map.getZoom() + offset);
+  function applyLensZoom(latlng) {
+    var pixelRadius = glass.options.radius;
+    var zoom = Lens.zoomForRadius(latlng.lat, pixelRadius, Lens.RADIUS_M);
+    zoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
+    glass._fixedZoom = true;
+    glass.options.fixedZoom = zoom;
+    var glassMap = glass.getMap();
+    if (glassMap) {
+      glassMap.options.zoomSnap = 0;
+      glassMap.options.zoomDelta = 0.1;
+    }
   }
 
   function updateZoomNote() {
@@ -109,12 +117,7 @@
       note.textContent = "The glass is hidden. The basemap stays in view.";
       return;
     }
-    var closer = glass.options.zoomOffset;
-    if (closer === 0) {
-      note.textContent = "The glass is at the same zoom as the map, so it works as a window onto the index.";
-    } else {
-      note.textContent = "The glass is " + closer + " zoom " + (closer === 1 ? "level" : "levels") + " closer than the map.";
-    }
+    note.textContent = "The lens covers a 250 m radius, the neighbourhood the QGIS tool scores. Scroll the map and the lens stays at that scale.";
   }
 
   function updateReadout(latlng) {
@@ -163,9 +166,10 @@
     return map.getCenter();
   }
 
-  function moveGlass(latlng, layerPoint) {
+  function moveGlass(latlng) {
     if (!glassOn || !map.hasLayer(glass)) return;
-    glass.setLatLng(latlng, layerPoint);
+    applyLensZoom(latlng);
+    glass.setLatLng(latlng);
     updateReadout(latlng);
   }
 
@@ -183,6 +187,8 @@
     }
     raisePotential();
     var glassMap = glass.getMap();
+    glassMap.options.zoomSnap = 0;
+    glassMap.options.zoomDelta = 0.1;
     glassMap.off("zoomend", raisePotential);
     glassMap.on("zoomend", raisePotential);
   }
@@ -252,9 +258,10 @@
 
     glassTiles = tileLayer("light");
     potential = L.imageOverlay(layer.image, layer.bounds, { opacity: 1, interactive: false });
+    var pixelRadius = Number(document.getElementById("radius").value);
     glass = L.magnifyingGlass({
-      radius: Number(document.getElementById("radius").value),
-      zoomOffset: Number(document.getElementById("zoom-offset").value),
+      radius: pixelRadius,
+      fixedZoom: Lens.zoomForRadius(layer.lens[0], pixelRadius, Lens.RADIUS_M),
       latLng: layer.lens,
       layers: [glassTiles, potential]
     });
@@ -278,11 +285,6 @@
       moveGlass(map.getCenter());
     });
 
-    document.getElementById("zoom-offset").addEventListener("input", function (event) {
-      glass.options.zoomOffset = Number(event.target.value);
-      document.getElementById("zoom-readout").textContent = event.target.value;
-      moveGlass(currentLatLng());
-    });
     document.getElementById("radius").addEventListener("input", function (event) {
       var radius = Number(event.target.value);
       document.getElementById("radius-readout").textContent = String(radius);

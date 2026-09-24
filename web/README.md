@@ -1,6 +1,8 @@
 # Map
 
-A Leaflet map with a [magnifying glass](https://github.com/bbecquet/Leaflet.MagnifyingGlass). The glass follows the pointer and shows biodiversity potential at a closer zoom than the basemap around it. Scroll the wheel to change the scale. The lens stays on the pointer, so the index underneath is what gets larger.
+A Leaflet map with a [magnifying glass](https://github.com/bbecquet/Leaflet.MagnifyingGlass). The glass follows the pointer and shows a finished biodiversity-potential index inside a 250 m radius, the same circle the QGIS tool scores. Scroll the map and the lens stays at that scale.
+
+The repository gives the tool away. This page invites people to view precomputed maps. Riverside Quarter is the worked example. London, Birmingham, Manchester and Leeds are filled in after those indexes are computed offline and uploaded.
 
 The layer on the page is the synthetic [Riverside Quarter](../examples/riverside_quarter/README.md) example. It is drawn in the English Channel on purpose. London, Birmingham, Manchester and Leeds are camera positions. Their index layers are not in this folder yet. A public XYZ tile URL on a place in `data/layers.json` is drawn in the glass when that city is selected.
 

@@ -33,11 +33,11 @@ The same garden scores 40 beside the wood and 20 in the housing. The street besi
 
 The full component table, and the checks that keep these ranks stable, are in the [example notes](examples/riverside_quarter/README.md).
 
-## Look through the magnifying glass
+## Two ways to see it
 
-[web/index.html](web/index.html) is a Leaflet map. A magnifying glass follows the pointer and shows the biodiversity potential underneath, drawn closer than the basemap around it. Drag to move, and use the wheel to change scale. The lens stays with the pointer.
+The repository is the QGIS tool. Anyone can run it on a 250 m circle of their own.
 
-The layer in the glass is the Riverside Quarter example above. The page shows that finished colouring. It does not score the landscape while someone is looking at it. London, Birmingham, Manchester and Leeds are places you can travel to. Their index layers are not published yet. When an offline run for a city is complete, a public Cloud Storage tile URL in `web/data/layers.json` is what the glass will read. Details are in [web/README.md](web/README.md).
+[web/index.html](web/index.html) is the public map. A magnifying glass follows the pointer and shows a finished index inside that same 250 m radius. Scroll the city and the lens stays at that scale. The page does not score anything while someone looks at it. Riverside Quarter is the worked example. London, Birmingham, Manchester and Leeds are shown after their indexes have been computed offline and uploaded to a Cloud Storage bucket. Details are in [web/README.md](web/README.md).
 
 ```
 python3 -m http.server -d web 8765

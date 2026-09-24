@@ -97,6 +97,25 @@ def test_city_tile_urls_survive_a_rebuild():
     assert "tiles" not in places[0]
 
 
+def test_lens_is_a_250_m_radius():
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("node is not installed")
+    script = r"""
+const lens = require("./web/lens.js");
+const lat = 51.5;
+const pixels = 132;
+const zoom = lens.zoomForRadius(lat, pixels, lens.RADIUS_M);
+const mpp = 156543.03392804097 * Math.cos(lat * Math.PI / 180) / Math.pow(2, zoom);
+const radius = mpp * pixels;
+process.stdout.write(String(lens.RADIUS_M) + "," + String(radius));
+"""
+    completed = subprocess.run([node, "-e", script], cwd=_ROOT, check=True, capture_output=True, text=True)
+    stated, measured = [float(part) for part in completed.stdout.split(",")]
+    assert stated == 250
+    assert measured == pytest.approx(250, abs=0.05)
+
+
 def test_javascript_transform_matches_python():
     node = shutil.which("node")
     if node is None:

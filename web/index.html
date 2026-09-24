@@ -13,7 +13,7 @@
   <aside id="panel" aria-live="polite">
     <p class="eyebrow">Urban ecology index</p>
     <h1>Biodiversity potential</h1>
-    <p class="lede">Move the magnifying glass. It draws the index underneath, closer than the map around it.</p>
+    <p class="lede">Move the magnifying glass. It shows the finished index inside a 250 m radius, the same circle the QGIS tool scores.</p>
     <p class="score" id="score">…</p>
     <p class="class-name" id="class-name">Loading the worked example</p>
     <p class="place" id="place"></p>
@@ -25,9 +25,7 @@
       <li><i style="background:#146c43"></i><span>65–100 Very high</span></li>
     </ul>
     <div class="controls">
-      <label>Magnification <output id="zoom-readout">2</output>
-        <input id="zoom-offset" type="range" min="0" max="3" step="1" value="2">
-      </label>
+      <p class="lens-scale">Lens: 250 m radius</p>
       <label>Lens size <output id="radius-readout">132</output>
         <input id="radius" type="range" min="80" max="180" step="4" value="132">
       </label>
@@ -39,7 +37,7 @@
       <div class="places" id="places" role="group" aria-label="Go to a place"></div>
     </div>
     <p class="note" id="zoom-note"></p>
-    <p class="note">Move the glass across the dashed circle. The colour is a finished 0–100 index for Riverside Quarter, a synthetic landscape placed in the English Channel so it stays separate from a real survey. London, Birmingham, Manchester and Leeds use the same glass once their finished maps are uploaded.</p>
+    <p class="note">The GitHub repository is the QGIS tool, for scoring a 250 m circle of your own. This page is the invitation to view precomputed maps through that same lens. Riverside Quarter, drawn in the English Channel, is the worked example. London, Birmingham, Manchester and Leeds appear here after their finished indexes are uploaded.</p>
     <p class="note">A neighbourhood screen. It stands apart from the Statutory Biodiversity Metric and from species records.</p>
     <p class="links">
       <a href="https://github.com/domusight/biodiversity/blob/main/docs/method.md">Method</a>
@@ -50,6 +48,7 @@
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="vendor/leaflet-magnifying-glass/leaflet.magnifyingglass.js"></script>
   <script src="osgb.js"></script>
+  <script src="lens.js"></script>
   <script src="map.js"></script>
 </body>
 </html>
