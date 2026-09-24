@@ -2,7 +2,9 @@
 
 ## Install
 
-The install file is `qgis/biodiversity_potential-0.1.0.zip`. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+The public install file is `qgis/biodiversity_potential-0.1.0.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.1.0.zip`. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+
+Download the zip itself. On GitHub, open the file and use **Download raw file**. A page saved from the browser is HTML, and QGIS then reports that the file is not a zip. The city zip is about 31 KB and begins with the characters `PK`.
 
 The zip contains one folder, `biodiversity_potential`, with `metadata.txt` inside it. That is the layout QGIS expects. Rebuild it with `make plugin-zip` after a plugin change.
 
