@@ -15,9 +15,6 @@ body {
   background: #c5d0d4;
 }
 
-.leaflet-tile.basemap-greyscale {
-  filter: grayscale(1);
-}
 
 #panel {
   position: absolute;
@@ -175,27 +172,6 @@ button[aria-pressed="true"] {
 .links a {
   color: #0c3b2e;
   margin-right: 10px;
-}
-
-.leaflet-magnifying-glass {
-  pointer-events: none;
-  border: 3px solid #0c3b2e;
-  box-shadow:
-    0 0 0 4px rgba(244, 241, 234, 0.92),
-    0 10px 24px rgba(12, 59, 46, 0.28);
-}
-
-.lens-hair {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 12px;
-  height: 12px;
-  margin: -8px 0 0 -8px;
-  border: 2px solid #f4f1ea;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px #0c3b2e;
-  z-index: 1000;
 }
 
 .leaflet-container {

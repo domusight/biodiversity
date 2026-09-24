@@ -1,5 +1,4 @@
-/* Leaflet map. The magnifying glass (Benjamin Becquet, MIT) shows the
-   biodiversity potential layer at a closer zoom than the basemap. */
+/* Leaflet map. Biodiversity potential is a translucent tile overlay. */
 (function () {
   var BASEMAPS = {
     light: {
@@ -7,7 +6,7 @@
       options: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
-        className: "basemap-greyscale"
+        pane: "basemap"
       }
     },
     satellite: {
@@ -15,211 +14,23 @@
       options: {
         attribution: 'Sentinel-2 cloudless &copy; <a href="https://s2maps.eu/">EOX</a> (contains modified Copernicus Sentinel data 2023)',
         maxZoom: 19,
-        maxNativeZoom: 16
+        maxNativeZoom: 16,
+        pane: "imagery"
       }
     }
   };
 
-  var map;
-  var glass;
-  var potential;
-  var config;
-  var grid;
-  var mainTiles;
-  var glassTiles;
-  var cityLayer = null;
-  var activePlace = null;
-  var pointerInside = false;
-  var lastContainerPoint = null;
-  var glassOn = true;
-
+  var INDEX_OPACITY = 0.72;
   var EMPTY_TILE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+  var map;
+  var mainTiles;
+  var indexLayer = null;
+  var activePlace = null;
 
   function tileLayer(name) {
     var spec = BASEMAPS[name];
     return L.tileLayer(spec.url, spec.options);
-  }
-
-  function syncGlassLayers() {
-    var layers = [glassTiles];
-    if (cityLayer) layers.push(cityLayer);
-    if (potential) layers.push(potential);
-    glass.options.layers = layers;
-  }
-
-  function setCityTiles(url) {
-    var glassMap = glassOn && map.hasLayer(glass) ? glass.getMap() : null;
-    if (cityLayer && glassMap) glassMap.removeLayer(cityLayer);
-    cityLayer = null;
-    if (url) {
-      cityLayer = L.tileLayer(url, {
-        opacity: 1,
-        maxZoom: 19,
-        maxNativeZoom: 18,
-        errorTileUrl: EMPTY_TILE
-      });
-      if (glassMap) cityLayer.addTo(glassMap);
-    }
-    syncGlassLayers();
-    if (glassMap) raisePotential();
-  }
-
-  function indexClass(score) {
-    if (score < 0.5) return "0–0.5";
-    if (score < 3) return "0.5–3";
-    if (score < 5) return "3–5";
-    if (score < 10) return "5–10";
-    if (score < 45) return "10–45";
-    if (score < 85) return "45–85";
-    return "85–100";
-  }
-
-  function sampleScore(latitude, longitude) {
-    if (!grid) return null;
-    var bng = OSGB.wgs84ToBng(latitude, longitude);
-    var easting = bng[0];
-    var northing = bng[1];
-    var column = Math.floor((easting - grid.origin_easting) / grid.cell_m);
-    var row = Math.floor((grid.origin_northing + grid.size_m - northing) / grid.cell_m);
-    if (column < 0 || row < 0 || column >= grid.width || row >= grid.height) return null;
-    var value = grid.values[row * grid.width + column];
-    if (value < 0) return null;
-    return { score: value, easting: easting, northing: northing };
-  }
-
-  function nearestSample(easting, northing) {
-    var best = null;
-    var bestDistance = 8;
-    if (!config.layer || !config.layer.samples) return null;
-    config.layer.samples.forEach(function (sample) {
-      var distance = Math.hypot(sample.easting - easting, sample.northing - northing);
-      if (distance <= bestDistance) {
-        best = sample;
-        bestDistance = distance;
-      }
-    });
-    return best;
-  }
-
-  function applyLensZoom(latlng) {
-    var pixelRadius = glass.options.radius;
-    var zoom = Lens.zoomForRadius(latlng.lat, pixelRadius, Lens.RADIUS_M);
-    zoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
-    glass._fixedZoom = true;
-    glass.options.fixedZoom = zoom;
-    var glassMap = glass.getMap();
-    if (glassMap) {
-      glassMap.options.zoomSnap = 0;
-      glassMap.options.zoomDelta = 0.1;
-    }
-  }
-
-  function updateZoomNote() {
-    var note = document.getElementById("zoom-note");
-    if (!glassOn) {
-      note.textContent = "The glass is hidden. The basemap stays in view.";
-      return;
-    }
-    note.textContent = "The lens covers a 250 m radius, the neighbourhood the QGIS tool scores. Scroll the map and the lens stays at that scale.";
-  }
-
-  function updateReadout(latlng) {
-    var scoreEl = document.getElementById("score");
-    var classEl = document.getElementById("class-name");
-    var placeEl = document.getElementById("place");
-    if (!glassOn) {
-      scoreEl.textContent = "—";
-      classEl.textContent = "Magnifying glass is off";
-      placeEl.textContent = "";
-      updateZoomNote();
-      return;
-    }
-    var reading = sampleScore(latlng.lat, latlng.lng);
-    if (!reading) {
-      scoreEl.textContent = "—";
-      if (activePlace && activePlace.tiles) {
-        classEl.textContent = activePlace.title;
-        placeEl.textContent = "The index for this city is drawn in the glass.";
-      } else {
-        classEl.textContent = "No index on this ground";
-        placeEl.textContent = "";
-      }
-      updateZoomNote();
-      return;
-    }
-    scoreEl.textContent = reading.score.toFixed(2);
-    classEl.textContent = indexClass(reading.score);
-    var named = nearestSample(reading.easting, reading.northing);
-    placeEl.textContent = named ? named.name : "";
-    updateZoomNote();
-  }
-
-  function currentLatLng() {
-    if (pointerInside && lastContainerPoint) {
-      return map.containerPointToLatLng(lastContainerPoint);
-    }
-    var stored = glass.options.latLng;
-    if (stored) return L.latLng(stored);
-    return map.getCenter();
-  }
-
-  function moveGlass(latlng) {
-    if (!glassOn || !map.hasLayer(glass)) return;
-    applyLensZoom(latlng);
-    glass.setLatLng(latlng);
-    updateReadout(latlng);
-  }
-
-  function raisePotential() {
-    if (potential && potential._map) potential.bringToFront();
-  }
-
-  function onGlassAdded() {
-    if (!glass._wrapperElt.querySelector(".lens-hair")) {
-      L.DomUtil.create("div", "lens-hair", glass._wrapperElt);
-    }
-    if (glassTiles) {
-      glassTiles.off("load", raisePotential);
-      glassTiles.on("load", raisePotential);
-    }
-    raisePotential();
-    var glassMap = glass.getMap();
-    glassMap.options.zoomSnap = 0;
-    glassMap.options.zoomDelta = 0.1;
-    glassMap.off("zoomend", raisePotential);
-    glassMap.on("zoomend", raisePotential);
-  }
-
-  function setBasemap(name) {
-    if (mainTiles) map.removeLayer(mainTiles);
-    mainTiles = tileLayer(name).addTo(map);
-    var replacement = tileLayer(name);
-    if (glassOn && map.hasLayer(glass)) {
-      glass.getMap().removeLayer(glassTiles);
-      replacement.addTo(glass.getMap());
-    }
-    glassTiles = replacement;
-    syncGlassLayers();
-    if (cityLayer && glassOn && map.hasLayer(glass)) cityLayer.bringToFront();
-    if (glassOn && map.hasLayer(glass)) onGlassAdded();
-    document.getElementById("basemap-light").setAttribute("aria-pressed", name === "light" ? "true" : "false");
-    document.getElementById("basemap-satellite").setAttribute("aria-pressed", name === "satellite" ? "true" : "false");
-  }
-
-  function setGlassVisible(visible) {
-    glassOn = visible;
-    var button = document.getElementById("toggle");
-    if (visible) {
-      if (!map.hasLayer(glass)) glass.addTo(map);
-      button.textContent = "Hide magnifying glass";
-      button.setAttribute("aria-pressed", "true");
-      moveGlass(currentLatLng());
-    } else if (map.hasLayer(glass)) {
-      map.removeLayer(glass);
-      button.textContent = "Show magnifying glass";
-      button.setAttribute("aria-pressed", "false");
-      updateReadout(map.getCenter());
-    }
   }
 
   function startingPlace(manifest) {
@@ -230,59 +41,72 @@
     return places[0];
   }
 
+  function setIndexTiles(url) {
+    if (indexLayer) {
+      map.removeLayer(indexLayer);
+      indexLayer = null;
+    }
+    if (!url) return;
+    indexLayer = L.tileLayer(url, {
+      pane: "index",
+      opacity: INDEX_OPACITY,
+      maxZoom: 19,
+      maxNativeZoom: 16,
+      errorTileUrl: EMPTY_TILE
+    });
+    indexLayer.addTo(map);
+  }
+
+  function setBasemap(name) {
+    if (mainTiles) map.removeLayer(mainTiles);
+    mainTiles = tileLayer(name).addTo(map);
+    if (indexLayer) indexLayer.bringToFront();
+    document.getElementById("basemap-light").setAttribute("aria-pressed", name === "light" ? "true" : "false");
+    document.getElementById("basemap-satellite").setAttribute("aria-pressed", name === "satellite" ? "true" : "false");
+  }
+
+  function showPlace(place) {
+    activePlace = place;
+    var title = document.getElementById("class-name");
+    var detail = document.getElementById("place");
+    title.textContent = place.title;
+    if (place.tiles) {
+      detail.textContent = "The index is the translucent green overlay.";
+      setIndexTiles(place.tiles);
+    } else {
+      detail.textContent = "No index has been uploaded for this place.";
+      setIndexTiles(null);
+    }
+    map.flyTo([place.lat, place.lon], place.zoom);
+  }
+
   function initMap(manifest) {
-    config = manifest;
     activePlace = startingPlace(manifest);
     map = L.map("map", {
       zoomControl: true,
       minZoom: 6,
-      maxZoom: 19
+      maxZoom: 18
     });
+    map.createPane("basemap");
+    map.getPane("basemap").style.zIndex = 200;
+    map.getPane("basemap").style.filter = "grayscale(1)";
+    map.createPane("imagery");
+    map.getPane("imagery").style.zIndex = 200;
+    map.createPane("index");
+    map.getPane("index").style.zIndex = 450;
+
     map.attributionControl.addAttribution(
       '<a href="https://github.com/domusight/biodiversity">Biodiversity potential</a>'
     );
     mainTiles = tileLayer("light").addTo(map);
     map.setView([activePlace.lat, activePlace.lon], activePlace.zoom);
+    setIndexTiles(activePlace.tiles || null);
 
-    glassTiles = tileLayer("light");
-    potential = null;
-    var pixelRadius = Number(document.getElementById("radius").value);
-    glass = L.magnifyingGlass({
-      radius: pixelRadius,
-      fixedZoom: Lens.zoomForRadius(activePlace.lat, pixelRadius, Lens.RADIUS_M),
-      latLng: [activePlace.lat, activePlace.lon],
-      layers: [glassTiles]
-    });
-    map.on("layeradd", function (event) {
-      if (event.layer === glass) onGlassAdded();
-    });
-    glass.addTo(map);
+    document.getElementById("class-name").textContent = activePlace.title;
+    document.getElementById("place").textContent = activePlace.tiles
+      ? "The index is the translucent green overlay."
+      : "No index has been uploaded for this place.";
 
-    map.on("mouseover", function () { pointerInside = true; });
-    map.on("mouseout", function () { pointerInside = false; });
-    map.on("mousemove", function (event) {
-      lastContainerPoint = event.containerPoint;
-      moveGlass(event.latlng, event.layerPoint);
-    });
-    map.on("zoom", function () {
-      if (!pointerInside) return;
-      moveGlass(currentLatLng());
-    });
-    map.on("move", function () {
-      if (pointerInside) return;
-      moveGlass(map.getCenter());
-    });
-
-    document.getElementById("radius").addEventListener("input", function (event) {
-      var radius = Number(event.target.value);
-      document.getElementById("radius-readout").textContent = String(radius);
-      glass.setRadius(radius);
-      if (glass.getMap()) glass.getMap().invalidateSize();
-      moveGlass(currentLatLng());
-    });
-    document.getElementById("toggle").addEventListener("click", function () {
-      setGlassVisible(!glassOn);
-    });
     document.getElementById("basemap-light").addEventListener("click", function () {
       setBasemap("light");
     });
@@ -296,23 +120,13 @@
       button.type = "button";
       button.textContent = place.title;
       button.addEventListener("click", function () {
-        activePlace = place;
-        pointerInside = false;
-        setCityTiles(place.tiles || null);
-        map.flyTo([place.lat, place.lon], place.zoom);
-        moveGlass(map.getCenter());
+        showPlace(place);
       });
       places.appendChild(button);
     });
-
-    document.getElementById("toggle").setAttribute("aria-pressed", "true");
-    setCityTiles(activePlace.tiles || null);
-    moveGlass(L.latLng(activePlace.lat, activePlace.lon));
-    updateZoomNote();
   }
 
   function fail(message) {
-    document.getElementById("score").textContent = "—";
     document.getElementById("class-name").textContent = message;
   }
 
@@ -324,10 +138,9 @@
       })
       .then(function (manifest) {
         initMap(manifest);
-        updateReadout(currentLatLng());
       })
       .catch(function () {
-        fail("The index layer did not load. Serve this folder over HTTP and reload.");
+        fail("The map did not load. Serve this folder over HTTP and reload.");
       });
   });
 })();

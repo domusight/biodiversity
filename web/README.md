@@ -1,6 +1,6 @@
 # Map
 
-A Leaflet map with a [magnifying glass](https://github.com/bbecquet/Leaflet.MagnifyingGlass). The glass follows the pointer and shows a finished biodiversity-potential index inside a 250 m radius, the same circle the QGIS tool scores. Scroll the map and the lens stays at that scale.
+A Leaflet map. The biodiversity-potential index is a translucent tile overlay on OpenStreetMap. The street map is greyscale. The index stays green. Where the city raster has no value, the overlay is transparent.
 
 The repository gives the tool away. This page shows precomputed maps. London is drawn from public tiles. Birmingham, Manchester and Leeds are camera positions until a `tiles` URL is set for them in `data/layers.json`.
 
@@ -45,7 +45,7 @@ Set `tiles` on that city in `data/layers.json`:
 "tiles": "https://storage.googleapis.com/BUCKET/london/{z}/{x}/{y}.png"
 ```
 
-Choosing the city then puts those finished tiles in the magnifying glass. Rebuilding the example keeps a `tiles` URL that is already in the file. The bucket can use uniform access and grant `allUsers` the Storage Object Viewer role on the tile objects. The glass loads them as images.
+Choosing the city puts those finished tiles on the map at partial opacity. Rebuilding the example keeps a `tiles` URL that is already in the file. The bucket can use uniform access and grant `allUsers` the Storage Object Viewer role on the tile objects. The page loads them as images.
 
 OS Open Greenspace, OS Open Rivers, Natural England inventories, and any Sentinel-2 NDVI are inputs to the offline run. They are not fetched when someone opens the map.
 
