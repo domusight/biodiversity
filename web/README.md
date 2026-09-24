@@ -2,9 +2,9 @@
 
 A Leaflet map with a [magnifying glass](https://github.com/bbecquet/Leaflet.MagnifyingGlass). The glass follows the pointer and shows a finished biodiversity-potential index inside a 250 m radius, the same circle the QGIS tool scores. Scroll the map and the lens stays at that scale.
 
-The repository gives the tool away. This page invites people to view precomputed maps. Riverside Quarter is the worked example. London, Birmingham, Manchester and Leeds are filled in after those indexes are computed offline and uploaded.
+The repository gives the tool away. This page shows precomputed maps. London is drawn from public tiles. Birmingham, Manchester and Leeds are camera positions until a `tiles` URL is set for them in `data/layers.json`.
 
-The layer on the page is the synthetic [Riverside Quarter](../examples/riverside_quarter/README.md) example. It is drawn in the English Channel on purpose. London, Birmingham, Manchester and Leeds are camera positions. Their index layers are not in this folder yet. A public XYZ tile URL on a place in `data/layers.json` is drawn in the glass when that city is selected.
+The basemap is OpenStreetMap, shown in greyscale. The biodiversity tiles stay in colour. The synthetic Riverside Quarter example is not on this page.
 
 ## Preview
 
@@ -28,7 +28,7 @@ python3 web/build_example_layer.py
 
 The page displays a finished index. Scoring happens offline, in QGIS or with the Python model, and the coloured raster is uploaded when that run is complete. Nothing is calculated in the browser, and the site does not call Earth Engine.
 
-The HTML stays in this repository. The city rasters are too large to commit, so the finished tiles belong in a Cloud Storage bucket with public read on the tile objects. No API key goes in the page. The light map and the Sentinel-2 cloudless basemap stay on their own servers.
+The HTML stays in this repository. The city rasters are too large to commit, so the finished tiles belong in a Cloud Storage bucket with public read on the tile objects. No API key goes in the page. OpenStreetMap and the Sentinel-2 cloudless basemap stay on their own servers.
 
 Object names:
 

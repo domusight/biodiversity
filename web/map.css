@@ -15,6 +15,10 @@ body {
   background: #c5d0d4;
 }
 
+.leaflet-tile.basemap-greyscale {
+  filter: grayscale(1);
+}
+
 #panel {
   position: absolute;
   z-index: 1100;

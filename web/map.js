@@ -3,11 +3,11 @@
 (function () {
   var BASEMAPS = {
     light: {
-      url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       options: {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: "abcd",
-        maxZoom: 20
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+        className: "basemap-greyscale"
       }
     },
     satellite: {
@@ -43,7 +43,7 @@
   function syncGlassLayers() {
     var layers = [glassTiles];
     if (cityLayer) layers.push(cityLayer);
-    layers.push(potential);
+    if (potential) layers.push(potential);
     glass.options.layers = layers;
   }
 
@@ -90,6 +90,7 @@
   function nearestSample(easting, northing) {
     var best = null;
     var bestDistance = 8;
+    if (!config.layer || !config.layer.samples) return null;
     config.layer.samples.forEach(function (sample) {
       var distance = Math.hypot(sample.easting - easting, sample.northing - northing);
       if (distance <= bestDistance) {
@@ -131,12 +132,6 @@
       classEl.textContent = "Magnifying glass is off";
       placeEl.textContent = "";
       updateZoomNote();
-      return;
-    }
-    if (!grid) {
-      scoreEl.textContent = "…";
-      classEl.textContent = "Loading the index";
-      placeEl.textContent = "";
       return;
     }
     var reading = sampleScore(latlng.lat, latlng.lng);
@@ -227,9 +222,17 @@
     }
   }
 
+  function startingPlace(manifest) {
+    var places = manifest.places || [];
+    for (var i = 0; i < places.length; i++) {
+      if (places[i].tiles) return places[i];
+    }
+    return places[0];
+  }
+
   function initMap(manifest) {
     config = manifest;
-    var layer = manifest.layer;
+    activePlace = startingPlace(manifest);
     map = L.map("map", {
       zoomControl: true,
       minZoom: 6,
@@ -239,33 +242,16 @@
       '<a href="https://github.com/domusight/biodiversity">Biodiversity potential</a>'
     );
     mainTiles = tileLayer("light").addTo(map);
-    map.setView(layer.center, layer.zoom);
-
-    L.circle(layer.aoi_center, {
-      radius: layer.radius_m,
-      color: "#f4f1ea",
-      weight: 5,
-      opacity: 0.95,
-      fill: false,
-      interactive: false
-    }).addTo(map);
-    L.circle(layer.aoi_center, {
-      radius: layer.radius_m,
-      color: "#0c3b2e",
-      weight: 2,
-      dashArray: "5 6",
-      fill: false,
-      interactive: false
-    }).addTo(map);
+    map.setView([activePlace.lat, activePlace.lon], activePlace.zoom);
 
     glassTiles = tileLayer("light");
-    potential = L.imageOverlay(layer.image, layer.bounds, { opacity: 1, interactive: false });
+    potential = null;
     var pixelRadius = Number(document.getElementById("radius").value);
     glass = L.magnifyingGlass({
       radius: pixelRadius,
-      fixedZoom: Lens.zoomForRadius(layer.lens[0], pixelRadius, Lens.RADIUS_M),
-      latLng: layer.lens,
-      layers: [glassTiles, potential]
+      fixedZoom: Lens.zoomForRadius(activePlace.lat, pixelRadius, Lens.RADIUS_M),
+      latLng: [activePlace.lat, activePlace.lon],
+      layers: [glassTiles]
     });
     map.on("layeradd", function (event) {
       if (event.layer === glass) onGlassAdded();
@@ -305,7 +291,6 @@
     });
 
     var places = document.getElementById("places");
-    activePlace = manifest.places[0];
     manifest.places.forEach(function (place) {
       var button = document.createElement("button");
       button.type = "button";
@@ -321,7 +306,8 @@
     });
 
     document.getElementById("toggle").setAttribute("aria-pressed", "true");
-    moveGlass(L.latLng(layer.lens));
+    setCityTiles(activePlace.tiles || null);
+    moveGlass(L.latLng(activePlace.lat, activePlace.lon));
     updateZoomNote();
   }
 
@@ -338,14 +324,6 @@
       })
       .then(function (manifest) {
         initMap(manifest);
-        return fetch(manifest.layer.index);
-      })
-      .then(function (response) {
-        if (!response.ok) throw new Error("index");
-        return response.json();
-      })
-      .then(function (index) {
-        grid = index;
         updateReadout(currentLatLng());
       })
       .catch(function () {

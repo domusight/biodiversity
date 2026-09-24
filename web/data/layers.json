@@ -125,13 +125,6 @@
   },
   "places": [
     {
-      "id": "riverside",
-      "title": "Example",
-      "lat": 50.26696719,
-      "lon": -1.42432829,
-      "zoom": 16
-    },
-    {
       "id": "london",
       "title": "London",
       "lat": 51.5074,

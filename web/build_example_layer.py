@@ -177,14 +177,7 @@ def attach_tiles(places, previous_places):
 
 def manifest(layer):
     """JSON manifest consumed by web/map.js."""
-    example_view = {
-        "id": "riverside",
-        "title": "Example",
-        "lat": layer["lens_wgs84"][0],
-        "lon": layer["lens_wgs84"][1],
-        "zoom": 16,
-    }
-    places = [example_view]
+    places = []
     for key, title, lat, lon, zoom in _CITY_VIEWS:
         places.append({"id": key, "title": title, "lat": lat, "lon": lon, "zoom": zoom})
     return {
