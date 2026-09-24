@@ -22,7 +22,6 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterField,
     QgsProcessingParameterNumber,
-    QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterRasterDestination,
     QgsProcessingParameterRasterLayer,
     QgsProcessingParameterVectorLayer,
@@ -100,6 +99,10 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     SSSI = "SSSI"
     LNR = "LNR"
     NDVI = "NDVI"
+    NDVI_1 = "NDVI_1"
+    NDVI_2 = "NDVI_2"
+    NDVI_3 = "NDVI_3"
+    NDVI_4 = "NDVI_4"
     OUTPUT = "OUTPUT"
     OUTPUT_COMPONENTS = "OUTPUT_COMPONENTS"
     OUTPUT_CELLS = "OUTPUT_CELLS"
@@ -216,14 +219,19 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         self._add_layer(self.SSSI, "Sites of Special Scientific Interest")
         self._add_layer(self.LNR, "Local Nature Reserves")
         if self.multiple_ndvi:
-            self.addParameter(
-                QgsProcessingParameterMultipleLayers(
-                    self.NDVI,
-                    self.tr("Sentinel-2 NDVI tiles (select every overlapping tile)"),
-                    layerType=QgsProcessing.TypeRaster,
-                    optional=True,
+            for name, title in (
+                (self.NDVI_1, "Sentinel-2 NDVI tile 1"),
+                (self.NDVI_2, "Sentinel-2 NDVI tile 2"),
+                (self.NDVI_3, "Sentinel-2 NDVI tile 3"),
+                (self.NDVI_4, "Sentinel-2 NDVI tile 4"),
+            ):
+                self.addParameter(
+                    QgsProcessingParameterRasterLayer(
+                        name,
+                        self.tr(title),
+                        optional=True,
+                    )
                 )
-            )
         else:
             self.addParameter(
                 QgsProcessingParameterRasterLayer(
@@ -480,10 +488,12 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
 
     def _ndvi_layers(self, parameters, context):
         if self.multiple_ndvi:
-            return [
-                layer for layer in self.parameterAsLayerList(parameters, self.NDVI, context)
-                if layer is not None
-            ]
+            layers = []
+            for name in (self.NDVI_1, self.NDVI_2, self.NDVI_3, self.NDVI_4):
+                layer = self.parameterAsRasterLayer(parameters, name, context)
+                if layer is not None:
+                    layers.append(layer)
+            return layers
         single = self.parameterAsRasterLayer(parameters, self.NDVI, context)
         if single is None:
             return []

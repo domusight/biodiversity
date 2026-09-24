@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Version 0.2.0. The large-area tool is named **Urban biodiversity potential (large area) 0.2.0** and has four NDVI file rows, tile 1 to tile 4. The install file is `qgis/biodiversity_potential-city-0.2.0.zip`.
+
 - The QGIS demo refuses a site that extends more than 500 m from its centre. The neighbourhood stays 250 m.
 - `qgis/biodiversity_potential-city-0.1.0.zip` adds a large-area tool. Give it a boundary such as Greater London and the full input layers. It clips to that boundary itself.
 - The large-area tool accepts several overlapping Sentinel-2 NDVI tiles and mosaics them.
