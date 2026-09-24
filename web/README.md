@@ -24,7 +24,9 @@ python3 web/build_example_layer.py
 
 ## City tiles on Google Cloud
 
-The HTML stays in this repository. The city rasters are too large to commit, so they belong in a Cloud Storage bucket with public read on the tile objects. No API key goes in the page. The light map and the Sentinel-2 cloudless basemap stay on their own servers.
+The page displays a finished index. Scoring happens offline, in QGIS or with the Python model, and the coloured raster is uploaded when that run is complete. Nothing is calculated in the browser, and the site does not call Earth Engine.
+
+The HTML stays in this repository. The city rasters are too large to commit, so the finished tiles belong in a Cloud Storage bucket with public read on the tile objects. No API key goes in the page. The light map and the Sentinel-2 cloudless basemap stay on their own servers.
 
 Object names:
 
@@ -41,9 +43,9 @@ Set `tiles` on that city in `data/layers.json`:
 "tiles": "https://storage.googleapis.com/BUCKET/london/{z}/{x}/{y}.png"
 ```
 
-Choosing the city then puts those tiles in the magnifying glass. Rebuilding the example keeps a `tiles` URL that is already in the file. The bucket can use uniform access and grant `allUsers` the Storage Object Viewer role on the tile objects. The glass loads them as images.
+Choosing the city then puts those finished tiles in the magnifying glass. Rebuilding the example keeps a `tiles` URL that is already in the file. The bucket can use uniform access and grant `allUsers` the Storage Object Viewer role on the tile objects. The glass loads them as images.
 
-Sentinel-2 NDVI for those cities can be built in Earth Engine on the same Google account. OS Open Greenspace, OS Open Rivers, and the Natural England inventories still come from their own downloads.
+OS Open Greenspace, OS Open Rivers, Natural England inventories, and any Sentinel-2 NDVI are inputs to the offline run. They are not fetched when someone opens the map.
 
 ## Publishing
 
