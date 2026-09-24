@@ -74,6 +74,7 @@ class _ApplyStyle(QgsProcessingLayerPostProcessorInterface):
 
 
 class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
+    enforces_demo_limit = True
     """Score biodiversity potential on a metre grid inside a small area."""
 
     AOI = "AOI"
@@ -269,7 +270,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
 
         cell = self.parameterAsDouble(parameters, self.CELL, context)
         neighbourhood = self.parameterAsDouble(parameters, self.NEIGHBOURHOOD, context)
-        if neighbourhood > DEMO_RADIUS_M:
+        if self.enforces_demo_limit and neighbourhood > DEMO_RADIUS_M:
             raise QgsProcessingException(self._demo_limit_message(neighbourhood))
         context_buffer = self.parameterAsDouble(parameters, self.CONTEXT, context)
         if context_buffer < neighbourhood:
@@ -279,10 +280,11 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             context_buffer = neighbourhood
 
         radius = self.parameterAsDouble(parameters, self.RADIUS, context)
-        if radius > DEMO_RADIUS_M:
+        if self.enforces_demo_limit and radius > DEMO_RADIUS_M:
             raise QgsProcessingException(self._demo_limit_message(radius))
         aoi = self._aoi_geometry(aoi_layer, radius)
-        self._require_demo_extent(aoi)
+        if self.enforces_demo_limit:
+            self._require_demo_extent(aoi)
         buffered = QgsGeometry(aoi).buffer(context_buffer, 24)
         grid = snap_grid(buffered.boundingBox(), cell)
         feedback.pushInfo(
@@ -293,118 +295,9 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         )
         feedback.setProgress(8)
 
-        layers = []
-        notes = []
-        base = self.parameterAsVectorLayer(parameters, self.BASE, context)
-        if base is not None:
-            layers.append(
-                self._burn_classified(
-                    base, grid, target_crs, context, feedback,
-                    self.BASE_FIELD, self.BASE_SCHEME, parameters, "Base land cover", False,
-                )
-            )
-        greenspace = self.parameterAsVectorLayer(parameters, self.GREENSPACE, context)
-        if greenspace is not None:
-            layers.append(
-                self._burn_fixed_scheme(
-                    greenspace, grid, target_crs, context, feedback,
-                    self.GREENSPACE_FIELD, parameters, "os_greenspace", "OS Open Greenspace", False,
-                )
-            )
-        overlay = self.parameterAsVectorLayer(parameters, self.OVERLAY, context)
-        if overlay is not None:
-            layers.append(
-                self._burn_classified(
-                    overlay, grid, target_crs, context, feedback,
-                    self.OVERLAY_FIELD, self.OVERLAY_SCHEME, parameters, "Habitat overlay", False,
-                )
-            )
-        water = self.parameterAsVectorLayer(parameters, self.SURFACE_WATER, context)
-        if water is not None:
-            layers.append(
-                self._burn_constant(
-                    water, grid, target_crs, context, feedback,
-                    int(Habitat.OPEN_WATER), "Surface water", True, 0.0,
-                )
-            )
-        rivers = self.parameterAsVectorLayer(parameters, self.RIVERS, context)
-        if rivers is not None:
-            width = self.parameterAsDouble(parameters, self.RIVER_WIDTH, context)
-            layers.append(
-                self._burn_constant(
-                    rivers, grid, target_crs, context, feedback,
-                    int(Habitat.OPEN_WATER), "Rivers", True, width / 2.0,
-                )
-            )
-        priority = self.parameterAsVectorLayer(parameters, self.PRIORITY, context)
-        if priority is not None:
-            layers.append(
-                self._burn_priority(priority, grid, target_crs, context, feedback, parameters)
-            )
-        ancient = self.parameterAsVectorLayer(parameters, self.ANCIENT, context)
-        if ancient is not None:
-            layers.append(
-                self._burn_constant(
-                    ancient, grid, target_crs, context, feedback,
-                    int(Habitat.ANCIENT_WOODLAND), "Ancient woodland", False, 0.0,
-                )
-            )
-        if not layers:
-            raise QgsProcessingException(
-                "Add at least one habitat layer: land cover, greenspace, an overlay, "
-                "water, priority habitat, or ancient woodland."
-            )
-        feedback.setProgress(35)
-
-        habitat_arrays = []
-        for array, layer_notes in layers:
-            habitat_arrays.append(array)
-            notes.extend(layer_notes)
-        for note in notes[:12]:
-            feedback.pushWarning(note)
-        if len(notes) > 12:
-            feedback.pushWarning("{0} further classification notes were omitted.".format(len(notes) - 12))
-
-        habitat = combine_habitat_layers(habitat_arrays)
-        if self.parameterAsBool(parameters, self.UNRECORDED_AS_SEALED, context):
-            habitat = np.array(habitat, copy=True)
-            habitat[habitat == int(Habitat.UNKNOWN)] = int(Habitat.SEALED)
-            feedback.pushInfo("Unrecorded cells were reclassed as sealed surface.")
-
-        designation = self._designation_mask(parameters, context, grid, target_crs, feedback)
-        aoi_mask = self._mask_from_geometry(aoi, grid, target_crs)
-        if not aoi_mask.any():
-            raise QgsProcessingException("No cells fall inside the area of interest. Check the radius and cell size.")
-
-        ndvi = None
-        ndvi_layer = self.parameterAsRasterLayer(parameters, self.NDVI, context)
-        if ndvi_layer is not None:
-            ndvi = sample_raster(ndvi_layer, grid, target_crs)
-
-        weights = self._weights(parameters, context, feedback)
-        config = ModelConfig(
-            cell_size_m=cell,
-            neighbourhood_radius_m=neighbourhood,
-            patch_reference_ha=self.parameterAsDouble(parameters, self.REFERENCE_HA, context),
-            species_area_z=self.parameterAsDouble(parameters, self.SPECIES_Z, context),
-            connectivity_half_distance_m=self.parameterAsDouble(parameters, self.CONNECTIVITY_HALF, context),
-            blue_half_distance_m=self.parameterAsDouble(parameters, self.BLUE_HALF, context),
-            interior_saturation_m=self.parameterAsDouble(parameters, self.INTERIOR_M, context),
-            weights=weights,
+        result, habitat, aoi_mask = self._score_window(
+            parameters, context, feedback, aoi, grid, target_crs, cell, neighbourhood
         )
-        feedback.setProgress(45)
-        try:
-            result = run_model(
-                habitat,
-                ndvi=ndvi,
-                designation=designation,
-                report_mask=aoi_mask,
-                config=config,
-            )
-        except ValueError as error:
-            raise QgsProcessingException(str(error))
-        feedback.setProgress(75)
-
         self._log_summary(feedback, result, habitat, aoi_mask)
         output_path = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)
         index = result.index.astype(float)
@@ -442,6 +335,124 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         feedback.setProgress(100)
         return results
 
+    def _score_window(self, parameters, context, feedback, aoi, grid, target_crs, cell, neighbourhood, allow_empty=False):
+            layers = []
+            notes = []
+            base = self.parameterAsVectorLayer(parameters, self.BASE, context)
+            if base is not None:
+                layers.append(
+                    self._burn_classified(
+                        base, grid, target_crs, context, feedback,
+                        self.BASE_FIELD, self.BASE_SCHEME, parameters, "Base land cover", False,
+                    )
+                )
+            greenspace = self.parameterAsVectorLayer(parameters, self.GREENSPACE, context)
+            if greenspace is not None:
+                layers.append(
+                    self._burn_fixed_scheme(
+                        greenspace, grid, target_crs, context, feedback,
+                        self.GREENSPACE_FIELD, parameters, "os_greenspace", "OS Open Greenspace", False,
+                    )
+                )
+            overlay = self.parameterAsVectorLayer(parameters, self.OVERLAY, context)
+            if overlay is not None:
+                layers.append(
+                    self._burn_classified(
+                        overlay, grid, target_crs, context, feedback,
+                        self.OVERLAY_FIELD, self.OVERLAY_SCHEME, parameters, "Habitat overlay", False,
+                    )
+                )
+            water = self.parameterAsVectorLayer(parameters, self.SURFACE_WATER, context)
+            if water is not None:
+                layers.append(
+                    self._burn_constant(
+                        water, grid, target_crs, context, feedback,
+                        int(Habitat.OPEN_WATER), "Surface water", True, 0.0,
+                    )
+                )
+            rivers = self.parameterAsVectorLayer(parameters, self.RIVERS, context)
+            if rivers is not None:
+                width = self.parameterAsDouble(parameters, self.RIVER_WIDTH, context)
+                layers.append(
+                    self._burn_constant(
+                        rivers, grid, target_crs, context, feedback,
+                        int(Habitat.OPEN_WATER), "Rivers", True, width / 2.0,
+                    )
+                )
+            priority = self.parameterAsVectorLayer(parameters, self.PRIORITY, context)
+            if priority is not None:
+                layers.append(
+                    self._burn_priority(priority, grid, target_crs, context, feedback, parameters)
+                )
+            ancient = self.parameterAsVectorLayer(parameters, self.ANCIENT, context)
+            if ancient is not None:
+                layers.append(
+                    self._burn_constant(
+                        ancient, grid, target_crs, context, feedback,
+                        int(Habitat.ANCIENT_WOODLAND), "Ancient woodland", False, 0.0,
+                    )
+                )
+            if not layers:
+                raise QgsProcessingException(
+                    "Add at least one habitat layer: land cover, greenspace, an overlay, "
+                    "water, priority habitat, or ancient woodland."
+                )
+            feedback.setProgress(35)
+
+            habitat_arrays = []
+            for array, layer_notes in layers:
+                habitat_arrays.append(array)
+                notes.extend(layer_notes)
+            for note in notes[:12]:
+                feedback.pushWarning(note)
+            if len(notes) > 12:
+                feedback.pushWarning("{0} further classification notes were omitted.".format(len(notes) - 12))
+
+            habitat = combine_habitat_layers(habitat_arrays)
+            if self.parameterAsBool(parameters, self.UNRECORDED_AS_SEALED, context):
+                habitat = np.array(habitat, copy=True)
+                habitat[habitat == int(Habitat.UNKNOWN)] = int(Habitat.SEALED)
+                feedback.pushInfo("Unrecorded cells were reclassed as sealed surface.")
+
+            designation = self._designation_mask(parameters, context, grid, target_crs, feedback)
+            aoi_mask = self._mask_from_geometry(aoi, grid, target_crs)
+            if not aoi_mask.any():
+                if allow_empty:
+                    return None, None, None
+                raise QgsProcessingException(
+                    "No cells fall inside the area of interest. Check the radius and cell size."
+                )
+
+            ndvi = None
+            ndvi_layer = self.parameterAsRasterLayer(parameters, self.NDVI, context)
+            if ndvi_layer is not None:
+                ndvi = sample_raster(ndvi_layer, grid, target_crs)
+
+            weights = self._weights(parameters, context, feedback)
+            config = ModelConfig(
+                cell_size_m=cell,
+                neighbourhood_radius_m=neighbourhood,
+                patch_reference_ha=self.parameterAsDouble(parameters, self.REFERENCE_HA, context),
+                species_area_z=self.parameterAsDouble(parameters, self.SPECIES_Z, context),
+                connectivity_half_distance_m=self.parameterAsDouble(parameters, self.CONNECTIVITY_HALF, context),
+                blue_half_distance_m=self.parameterAsDouble(parameters, self.BLUE_HALF, context),
+                interior_saturation_m=self.parameterAsDouble(parameters, self.INTERIOR_M, context),
+                weights=weights,
+            )
+            feedback.setProgress(45)
+            try:
+                result = run_model(
+                    habitat,
+                    ndvi=ndvi,
+                    designation=designation,
+                    report_mask=aoi_mask,
+                    config=config,
+                )
+            except ValueError as error:
+                raise QgsProcessingException(str(error))
+            feedback.setProgress(75)
+            return result, habitat, aoi_mask
+
     def _aoi_geometry(self, layer, radius):
         parts = []
         for feature in layer.getFeatures():
@@ -472,8 +483,8 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     def _demo_limit_message(self, reached_m):
         return (
             "This demo scores a site within {0:.0f} m of its centre. "
-            "This one reaches {1:.0f} m. London and the other cities use the same index, "
-            "computed offline for the whole city and published on the map."
+            "This one reaches {1:.0f} m. For a city boundary, use "
+            "Urban biodiversity potential (large area)."
         ).format(DEMO_RADIUS_M, reached_m)
 
     def _require_metres(self, crs):

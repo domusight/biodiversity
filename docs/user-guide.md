@@ -59,11 +59,11 @@ Turn on the optional component raster to see which term produced a score. The ba
 
 The optional cell polygons carry the same numbers as attributes, for the identify tool. Leave them off on anything larger than a neighbourhood. Above 250,000 cells they are skipped.
 
-## A whole city
+## Two tools
 
-London is the same index. There is no second tool and no second formula. The plugin stops at 500 m so the copy you give away stays a neighbourhood demo.
+The public install file is the demo above. It stops at 500 m.
 
-A city run uses the same inputs, clipped to the city plus at least 1 km, and the same weights. Score it in tiles of a few kilometres, each with the 1 km context, then mosaic the index rasters. Colour the mosaic with `style/biodiversity_potential.qml`, cut XYZ tiles, and upload them to the Cloud Storage bucket named in `web/README.md`. The page only displays that finished layer.
+`qgis/biodiversity_potential-city-0.1.0.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area)** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
 
 ## Prepare a repeatable project
 

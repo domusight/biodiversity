@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 
 _PLUGIN = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential")
 _ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-0.1.0.zip")
+_CITY_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-city-0.1.0.zip")
 
 
 def test_plugin_sources_parse():
@@ -49,6 +50,14 @@ def test_install_zip_has_one_plugin_folder():
     assert "__pycache__" not in "".join(names)
     tops = {name.split("/")[0] for name in names}
     assert tops == {"biodiversity_potential"}
+    assert "biodiversity_potential/large.py" not in names
+
+
+def test_city_zip_adds_the_large_area_tool():
+    with zipfile.ZipFile(_CITY_ZIP) as archive:
+        names = archive.namelist()
+    assert "biodiversity_potential/large.py" in names
+    assert "biodiversity_potential/metadata.txt" in names
 
 
 def test_style_file_is_xml_and_covers_the_index_range():

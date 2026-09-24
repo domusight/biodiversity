@@ -27,3 +27,8 @@ class BiodiversityPotentialProvider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
         self.addAlgorithm(BiodiversityPotentialAlgorithm())
+        try:
+            from .large import LargeAreaAlgorithm
+        except ImportError:
+            return
+        self.addAlgorithm(LargeAreaAlgorithm())

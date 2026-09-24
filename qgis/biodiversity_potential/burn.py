@@ -19,7 +19,7 @@ from qgis.core import (
 NODATA = -999
 
 
-def snap_grid(extent, cell_size):
+def snap_grid(extent, cell_size, max_cells=4_000_000):
     """Align an extent to the cell size. Row 0 of the resulting grid is north."""
     if cell_size <= 0:
         raise QgsProcessingException("Cell size must be greater than zero.")
@@ -31,7 +31,7 @@ def snap_grid(extent, cell_size):
     height = int(round((ymax - ymin) / cell_size))
     if width < 1 or height < 1:
         raise QgsProcessingException("The area of interest has no area at this cell size.")
-    if width * height > 4_000_000:
+    if max_cells is not None and width * height > max_cells:
         raise QgsProcessingException(
             "The grid would be {0} by {1} cells. Use a larger cell size or a smaller area.".format(
                 width, height
@@ -181,6 +181,37 @@ def write_geotiff(path, array, grid, crs_wkt, nodata, descriptions):
         band.FlushCache()
     dataset.FlushCache()
     dataset = None
+
+
+def create_geotiff(path, grid, crs_wkt, nodata, description):
+    """Create a one-band float32 GeoTIFF filled with nodata. Row 0 is north."""
+    driver = gdal.GetDriverByName("GTiff")
+    dataset = driver.Create(
+        path,
+        grid["width"],
+        grid["height"],
+        1,
+        gdal.GDT_Float32,
+        options=["COMPRESS=DEFLATE", "TILED=YES", "PREDICTOR=3", "BIGTIFF=IF_SAFER"],
+    )
+    if dataset is None:
+        raise QgsProcessingException("Could not create {0}.".format(path))
+    dataset.SetGeoTransform((grid["xmin"], grid["cell"], 0.0, grid["ymax"], 0.0, -grid["cell"]))
+    dataset.SetProjection(crs_wkt)
+    band = dataset.GetRasterBand(1)
+    band.Fill(float(nodata))
+    band.SetNoDataValue(float(nodata))
+    band.SetDescription(description)
+    band.FlushCache()
+    return dataset
+
+
+def write_array_window(dataset, grid, array, nodata, column, row):
+    """Write a north-up array into an open GeoTIFF at pixel ``column``, ``row``."""
+    data = np.asarray(array, dtype=np.float32)
+    band = dataset.GetRasterBand(1)
+    band.WriteArray(np.where(np.isnan(data), nodata, data), int(column), int(row))
+    band.FlushCache()
 
 
 def _prepared_geometry(geometry, transform, line_buffer_m, cell_size):
