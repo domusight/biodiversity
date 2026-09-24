@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biodiversity potential</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="map.css">
+</head>
+<body>
+  <div id="map" role="application" aria-label="Map. Biodiversity potential is a translucent overlay."></div>
+  <aside id="panel" aria-live="polite">
+    <p class="eyebrow">Urban ecology index</p>
+    <h1>Biodiversity potential</h1>
+    <p class="lede">The green overlay is the finished index. Streets and satellite imagery show through it.</p>
+    <p class="class-name" id="class-name">London</p>
+    <p class="place" id="place"></p>
+    <ul class="legend" aria-label="Legend">
+      <li><i style="background:#edf8e9"></i><span>0–0.5</span></li>
+      <li><i style="background:#c7e9c0"></i><span>0.5–3</span></li>
+      <li><i style="background:#a1d99b"></i><span>3–5</span></li>
+      <li><i style="background:#74c476"></i><span>5–10</span></li>
+      <li><i style="background:#41ab5d"></i><span>10–45</span></li>
+      <li><i style="background:#238b45"></i><span>45–85</span></li>
+      <li><i style="background:#005a32"></i><span>85–100</span></li>
+    </ul>
+    <div class="controls">
+      <div class="basemap" role="group" aria-label="Basemap">
+        <button type="button" id="basemap-light" aria-pressed="true">Map</button>
+        <button type="button" id="basemap-satellite" aria-pressed="false">Satellite</button>
+      </div>
+      <div class="places" id="places" role="group" aria-label="Go to a place"></div>
+    </div>
+    <p class="note">The GitHub repository is the QGIS tool, for scoring a neighbourhood of your own. This page shows the finished index for a whole city. Outside the city boundary the overlay is empty, so the base map shows through.</p>
+    <p class="note">A neighbourhood screen. It stands apart from the Statutory Biodiversity Metric and from species records.</p>
+    <p class="links">
+      <a href="https://github.com/domusight/biodiversity/blob/main/docs/method.md">Method</a>
+      <a href="https://github.com/domusight/biodiversity/blob/main/docs/theory.md">Theory</a>
+      <a href="https://github.com/domusight/biodiversity">Repository</a>
+    </p>
+  </aside>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="map.js"></script>
+</body>
+</html>

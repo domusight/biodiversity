@@ -1,0 +1,58 @@
+# Map
+
+A Leaflet map. The biodiversity-potential index is drawn over OpenStreetMap with the multiply blend, the same idea as multiply translucency in QGIS. The street map is greyscale. The index stays green, and road lines remain visible through it. Where the city raster has no value, the overlay is transparent.
+
+The repository gives the tool away. This page shows precomputed maps. London is drawn from public tiles. Birmingham, Manchester and Leeds are camera positions until a `tiles` URL is set for them in `data/layers.json`.
+
+The basemap is OpenStreetMap, shown in greyscale. The biodiversity tiles stay in colour. The synthetic Riverside Quarter example is not on this page.
+
+## Preview
+
+From the repository root:
+
+```
+python3 -m http.server -d web 8765
+```
+
+Open `http://127.0.0.1:8765/`. Fetching the index needs HTTP. Opening the file directly will not load it.
+
+Regenerate the image and the index after a model change:
+
+```
+python3 web/build_example_layer.py
+```
+
+`tests/test_web_layer.py` checks that the published grid still matches the named scores.
+
+## City tiles on Google Cloud
+
+The page displays a finished index. Scoring happens offline, in QGIS or with the Python model, and the coloured raster is uploaded when that run is complete. Nothing is calculated in the browser, and the site does not call Earth Engine.
+
+The HTML stays in this repository. The city rasters are too large to commit, so the finished tiles belong in a Cloud Storage bucket with public read on the tile objects. No API key goes in the page. OpenStreetMap and the Sentinel-2 cloudless basemap stay on their own servers.
+
+Object names:
+
+```
+london/{z}/{x}/{y}.png
+birmingham/{z}/{x}/{y}.png
+manchester/{z}/{x}/{y}.png
+leeds/{z}/{x}/{y}.png
+```
+
+Set `tiles` on that city in `data/layers.json`:
+
+```json
+"tiles": "https://storage.googleapis.com/BUCKET/london/{z}/{x}/{y}.png"
+```
+
+Choosing the city puts those finished tiles on the map at partial opacity. Rebuilding the example keeps a `tiles` URL that is already in the file. The bucket can use uniform access and grant `allUsers` the Storage Object Viewer role on the tile objects. The page loads them as images.
+
+OS Open Greenspace, OS Open Rivers, Natural England inventories, and any Sentinel-2 NDVI are inputs to the offline run. They are not fetched when someone opens the map.
+
+## Publishing
+
+`.github/workflows/pages.yml` deploys this folder with GitHub Actions when `main` is pushed. In the repository settings, set Pages to **GitHub Actions**. The site is then `https://domusight.github.io/biodiversity/`.
+
+Basemap tiles are requested from CARTO (light map, © OpenStreetMap contributors © CARTO) and from EOX Sentinel-2 cloudless (satellite, contains modified Copernicus Sentinel data). The index itself is computed in this repository. It is a neighbourhood screen, separate from the Statutory Biodiversity Metric and from species records.
+
+Leaflet 1.9.4 is BSD-2-Clause. Leaflet.MagnifyingGlass is MIT. Both sit in `vendor/` with their licences.
