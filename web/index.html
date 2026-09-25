@@ -12,27 +12,35 @@
   <aside id="panel" aria-live="polite">
     <p class="eyebrow">Urban ecology index</p>
     <h1>Biodiversity potential</h1>
-    <p class="lede">The green overlay is the finished index. Streets and satellite imagery show through it.</p>
+    <p class="lede">In this piece of town, where does the land offer more biodiversity potential, and where does it offer less?</p>
+    <div id="about-more" hidden>
+      <p>It answers with a 0–100 index on a 10 m grid. Each cell looks at a neighbourhood of 250 m, about the scale of a park, a housing block, or a development site. That is large enough for a wood, a pond and the streets around them to sit in the same view, and small enough that a person can go and look.</p>
+      <p>The index is a screening layer. A high cell is a place the published urban-ecology literature would expect to matter. A low cell is a place that literature would expect to matter little, until the surface or its surroundings change. The number is not a species count.</p>
+      <p>The weights follow Beninde, Veith and Hochkirch (2015). They reviewed biodiversity inside cities. The strongest effects were patch area and corridors, then vegetation structure. Local habitat mattered more than a broad urban-to-rural label. The eight weights are a translation of that order, not a fitted regression: patch area 0.22, local habitat amount 0.18, connectivity 0.16, vegetation 0.14, distinctiveness 0.14, blue infrastructure 0.08, heterogeneity 0.05, interior 0.03.</p>
+      <p>This page shows that finished index for London. The green overlay lets the streets show through. Outside the mapped area the overlay is empty. It is not the Statutory Biodiversity Metric, and it does not record species.</p>
+    </div>
+    <button type="button" id="about-toggle" class="text-toggle" aria-expanded="false" aria-controls="about-more">Read more</button>
+    <details class="legend-box" id="legend">
+      <summary>Legend</summary>
+      <ul class="legend" aria-label="Legend">
+        <li><i style="background:#edf8e9"></i><span>0–0.5</span></li>
+        <li><i style="background:#c7e9c0"></i><span>0.5–3</span></li>
+        <li><i style="background:#a1d99b"></i><span>3–5</span></li>
+        <li><i style="background:#74c476"></i><span>5–10</span></li>
+        <li><i style="background:#41ab5d"></i><span>10–45</span></li>
+        <li><i style="background:#238b45"></i><span>45–85</span></li>
+        <li><i style="background:#005a32"></i><span>85–100</span></li>
+      </ul>
+    </details>
     <p class="class-name" id="class-name">London</p>
     <p class="place" id="place"></p>
-    <ul class="legend" aria-label="Legend">
-      <li><i style="background:#edf8e9"></i><span>0–0.5</span></li>
-      <li><i style="background:#c7e9c0"></i><span>0.5–3</span></li>
-      <li><i style="background:#a1d99b"></i><span>3–5</span></li>
-      <li><i style="background:#74c476"></i><span>5–10</span></li>
-      <li><i style="background:#41ab5d"></i><span>10–45</span></li>
-      <li><i style="background:#238b45"></i><span>45–85</span></li>
-      <li><i style="background:#005a32"></i><span>85–100</span></li>
-    </ul>
     <div class="controls">
       <div class="basemap" role="group" aria-label="Basemap">
         <button type="button" id="basemap-light" aria-pressed="true">Map</button>
         <button type="button" id="basemap-satellite" aria-pressed="false">Satellite</button>
       </div>
-      <div class="places" id="places" role="group" aria-label="Go to a place"></div>
+      <div class="places" id="places" role="group" aria-label="Go to a place" hidden></div>
     </div>
-    <p class="note">The GitHub repository is the QGIS tool, for scoring a neighbourhood of your own. This page shows the finished index for a whole city. Outside the city boundary the overlay is empty, so the base map shows through.</p>
-    <p class="note">A neighbourhood screen. It stands apart from the Statutory Biodiversity Metric and from species records.</p>
     <p class="links">
       <a href="https://github.com/domusight/biodiversity/blob/main/docs/method.md">Method</a>
       <a href="https://github.com/domusight/biodiversity/blob/main/docs/theory.md">Theory</a>

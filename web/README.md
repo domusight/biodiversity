@@ -2,7 +2,7 @@
 
 A Leaflet map. The biodiversity-potential index is drawn over OpenStreetMap with the multiply blend, the same idea as multiply translucency in QGIS. The street map is greyscale. The index stays green, and road lines remain visible through it. Where the city raster has no value, the overlay is transparent.
 
-The repository gives the tool away. This page shows precomputed maps. London is drawn from public tiles. Birmingham, Manchester and Leeds are camera positions until a `tiles` URL is set for them in `data/layers.json`.
+The repository gives the tool away. This page shows the precomputed London index.
 
 The basemap is OpenStreetMap, shown in greyscale. The biodiversity tiles stay in colour. The synthetic Riverside Quarter example is not on this page.
 

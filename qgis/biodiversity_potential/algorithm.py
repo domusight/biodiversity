@@ -45,6 +45,7 @@ from .habitats import Habitat, label
 from .model import COMPONENT_ORDER, Weights, ModelConfig, run_model
 from .tiles import core_window, plan_cores
 
+_DOCS_URL = "https://github.com/domusight/biodiversity/blob/main/docs/user-guide.md"
 _STYLE = os.path.join(os.path.dirname(__file__), "style", "biodiversity_potential.qml")
 _OUTPUT_NODATA = -9999.0
 _SCHEME_LABELS = [
@@ -144,25 +145,27 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     def groupId(self):
         return "urbanecology"
 
+    def helpUrl(self):
+        return _DOCS_URL
+
     def shortHelpString(self):
         return self.tr(
-            "Scores the biodiversity potential of each 10 m cell. "
+            "<p>Scores the biodiversity potential of each 10 m cell. "
             "The study area is a polygon, or a point layer buffered by the radius you set. "
             "There is no size cap. A large polygon is scored in tiles. "
             "Each cell still looks 250 m around itself. The score is a 0–100 index built from "
             "patch area, local habitat amount, connectivity, vegetation, "
-            "distinctiveness, water, heterogeneity and interior habitat.\n\n"
-            "It is a screening map for where potential sits. It is not a species "
+            "distinctiveness, water, heterogeneity and interior habitat.</p>"
+            "<p>It is a screening map for where potential sits. It is not a species "
             "survey, and it is not the Statutory Biodiversity Metric. Give it "
             "British National Grid layers: a wall-to-wall land cover such as ESA "
             "WorldCover, OS Open Greenspace, OS Open Map Local surface water lines, "
             "surface water area and tidal water, the Priority Habitat Inventory, Ancient Woodland, and "
             "up to four Sentinel-2 NDVI rasters. Narrow streams are SurfaceWater_Line only. "
             "The tool reads features inside the area plus the context buffer, so you do not "
-            "clip national layers yourself.\n\n"
-            "The reasoning, equations and data catalogue are in the project documentation: "
-            "https://github.com/domusight/biodiversity"
-        )
+            "clip national layers yourself.</p>"
+            '<p><a href="{0}">Documentation</a></p>'
+        ).format(_DOCS_URL)
 
     def flags(self):
         return super().flags() | QgsProcessingAlgorithm.FlagNoThreading

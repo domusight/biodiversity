@@ -7,7 +7,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 
 _PLUGIN = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential")
-_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-0.3.0.zip")
+_ZIP = os.path.join(os.path.dirname(__file__), "..", "qgis", "biodiversity_potential-0.3.1.zip")
 
 
 def test_plugin_sources_parse():
@@ -40,7 +40,7 @@ def test_metadata_has_the_processing_provider_flag():
     ):
         assert keys.get(required)
     assert keys["hasProcessingProvider"] == "yes"
-    assert keys["version"] == "0.3.0"
+    assert keys["version"] == "0.3.1"
 
 
 def test_install_zip_is_one_tool():
@@ -58,6 +58,8 @@ def test_install_zip_is_one_tool():
     assert "def createInstance" in algorithm
     assert "return BiodiversityPotentialAlgorithm()" in algorithm
     assert 'return self.tr("Urban biodiversity potential {0}".format(__version__))' in algorithm
+    assert "https://github.com/domusight/biodiversity/blob/main/docs/user-guide.md" in algorithm
+    assert "def helpUrl" in algorithm
     assert "LargeAreaAlgorithm" not in provider
     assert "addAlgorithm(BiodiversityPotentialAlgorithm())" in provider
 

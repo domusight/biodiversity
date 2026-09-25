@@ -2,7 +2,7 @@
 
 ## Install
 
-The install file is `qgis/biodiversity_potential-0.3.0.zip`. The toolbox name ends in **0.3.0**. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+The install file is `qgis/biodiversity_potential-0.3.1.zip`. The toolbox name ends in **0.3.1**. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
 
 Download the zip itself. On GitHub, open the file and use **Download raw file**. A page saved from the browser is HTML, and QGIS then reports that the file is not a zip. The zip begins with the characters `PK`.
 
@@ -14,7 +14,7 @@ You can also copy the folder `qgis/biodiversity_potential` itself, not the whole
 - macOS: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
 - Windows: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
 
-Restart QGIS. In **Plugins → Manage and Install Plugins**, turn on **Biodiversity potential**. In the Processing toolbox, open **Biodiversity potential → Urban ecology → Urban biodiversity potential 0.3.0**.
+Restart QGIS. In **Plugins → Manage and Install Plugins**, turn on **Biodiversity potential**. In the Processing toolbox, open **Biodiversity potential → Urban ecology → Urban biodiversity potential 0.3.1**.
 
 QGIS 3.28 or later. The area of interest must be in a projected CRS with metre units. For English open data that is British National Grid, EPSG:27700.
 

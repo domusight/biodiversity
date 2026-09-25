@@ -37,7 +37,7 @@ The full component table, and the checks that keep these ranks stable, are in th
 
 Each cell is scored from a 250 m neighbourhood. A point uses the radius you set. A polygon, including a city boundary such as Greater London, uses the same index and is scored in tiles. Give the tool the boundary and the full input layers. It clips them itself.
 
-[web/index.html](web/index.html) is the public map. The green overlay is a finished index. The page does not score anything while someone looks at it. London is the published city layer. Birmingham, Manchester and Leeds are camera positions until their indexes are uploaded. Details are in [web/README.md](web/README.md).
+[web/index.html](web/index.html) is the public map of London. The green overlay is a finished index. The page does not score anything while someone looks at it. Details are in [web/README.md](web/README.md).
 
 ```
 python3 -m http.server -d web 8765
@@ -64,7 +64,7 @@ Distinctiveness follows the Metric bands (0, 2, 4, 6, 8, divided by 8). Gardens 
 
 ## Run it in QGIS
 
-Install `qgis/biodiversity_potential-0.3.0.zip` with **Plugins → Manage and Install Plugins → Install from ZIP**, then enable **Biodiversity potential** and open **Urban biodiversity potential 0.3.0** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
+Install `qgis/biodiversity_potential-0.3.1.zip` with **Plugins → Manage and Install Plugins → Install from ZIP**, then enable **Biodiversity potential** and open **Urban biodiversity potential 0.3.1** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
 
 The steps, the parameters, and how to build a floating-point NDVI from Sentinel-2 are in [docs/user-guide.md](docs/user-guide.md). Dataset links and licences are in [docs/data-sources.md](docs/data-sources.md).
 

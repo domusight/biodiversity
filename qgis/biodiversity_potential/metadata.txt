@@ -2,7 +2,7 @@
 name=Biodiversity potential
 qgisMinimumVersion=3.28
 description=Score biodiversity potential for a point and radius, or for a polygon of any size, from open habitat, designation and satellite data.
-version=0.3.0
+version=0.3.1
 author=Domusight
 email=domusight@users.noreply.github.com
 about=Landscape-ecology screening index. The study area is a point buffer or a polygon. Not a species survey and not the Statutory Biodiversity Metric.

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Version 0.3.1 puts a Documentation link in the tool description. It opens the user guide in the GitHub repository. The install file is `qgis/biodiversity_potential-0.3.1.zip`.
+
+- The public map shows London only. The legend can be collapsed, and the panel introduces the index from the theory note, with the rest behind Read more.
+
 - Version 0.3.0 is one tool, **Urban biodiversity potential 0.3.0**. The study area is a point plus a radius, or a polygon of any size. A large polygon is scored in tiles. There is no 500 m cap and no second install file. The install file is `qgis/biodiversity_potential-0.3.0.zip`.
 
 - Narrow streams come only from OS Open Map Local `SurfaceWater_Line`. The river-centreline input is removed.
