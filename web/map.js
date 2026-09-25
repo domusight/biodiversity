@@ -115,15 +115,32 @@
     });
 
     var places = document.getElementById("places");
-    manifest.places.forEach(function (place) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.textContent = place.title;
-      button.addEventListener("click", function () {
-        showPlace(place);
+    if (manifest.places.length > 1) {
+      places.hidden = false;
+      manifest.places.forEach(function (place) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.textContent = place.title;
+        button.addEventListener("click", function () {
+          showPlace(place);
+        });
+        places.appendChild(button);
       });
-      places.appendChild(button);
+    }
+
+    var about = document.getElementById("about-more");
+    var aboutToggle = document.getElementById("about-toggle");
+    aboutToggle.addEventListener("click", function () {
+      var open = about.hidden;
+      about.hidden = !open;
+      aboutToggle.textContent = open ? "Show less" : "Read more";
+      aboutToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
+
+    var legend = document.getElementById("legend");
+    if (window.matchMedia("(min-width: 721px)").matches) {
+      legend.open = true;
+    }
   }
 
   function fail(message) {

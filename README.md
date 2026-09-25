@@ -1,8 +1,8 @@
 # Biodiversity potential
 
-A QGIS tool that takes a small urban area, by default a circle of 250 m radius, and maps where biodiversity potential is higher and lower inside it.
+A QGIS tool that maps where biodiversity potential is higher and lower. The study area is a point plus a radius, by default 250 m, or a polygon of any size.
 
-The result is a 0–100 raster. Darker green is higher potential. It is a screening layer built from published urban ecology and from open data: Ordnance Survey Open Greenspace and Open Rivers, Natural England’s Priority Habitat Inventory, Ancient Woodland, SSSI and Local Nature Reserves, ESA WorldCover, and an optional Sentinel-2 NDVI. The reasoning is written out in [docs/theory.md](docs/theory.md). The equations are in [docs/method.md](docs/method.md).
+The result is a 0–100 raster. Darker green is higher potential. It is a screening layer built from published urban ecology and from open data: Ordnance Survey Open Greenspace and Open Map Local, Natural England’s Priority Habitat Inventory, Ancient Woodland, SSSI and Local Nature Reserves, ESA WorldCover, and optional Sentinel-2 NDVI. Narrow streams are Open Map Local `SurfaceWater_Line`. The reasoning is written out in [docs/theory.md](docs/theory.md). The equations are in [docs/method.md](docs/method.md).
 
 This is a landscape screen for a neighbourhood. Statutory Biodiversity Net Gain calculations remain the Statutory Biodiversity Metric plus a field condition assessment. This index does not implement that metric’s condition scores or trading rules, and it does not record species.
 
@@ -33,11 +33,11 @@ The same garden scores 40 beside the wood and 20 in the housing. The street besi
 
 The full component table, and the checks that keep these ranks stable, are in the [example notes](examples/riverside_quarter/README.md).
 
-## Two ways to see it
+## The map
 
-The public tool runs on a site within 500 m of its centre. Each cell is still scored from a 250 m neighbourhood. A second install file, `qgis/biodiversity_potential-city-0.2.6.zip`, scores a whole boundary such as Greater London from the same index. Give it the boundary and the full input layers. It clips them itself.
+Each cell is scored from a 250 m neighbourhood. A point uses the radius you set. A polygon, including a city boundary such as Greater London, uses the same index and is scored in tiles. Give the tool the boundary and the full input layers. It clips them itself.
 
-[web/index.html](web/index.html) is the public map. A magnifying glass follows the pointer and shows a finished index inside that same 250 m radius. Scroll the city and the lens stays at that scale. The page does not score anything while someone looks at it. Riverside Quarter is the worked example. London, Birmingham, Manchester and Leeds are shown after their indexes have been computed offline and uploaded to a Cloud Storage bucket. Details are in [web/README.md](web/README.md).
+[web/index.html](web/index.html) is the public map of London. The green overlay is a finished index. The page does not score anything while someone looks at it. Details are in [web/README.md](web/README.md).
 
 ```
 python3 -m http.server -d web 8765
@@ -64,7 +64,7 @@ Distinctiveness follows the Metric bands (0, 2, 4, 6, 8, divided by 8). Gardens 
 
 ## Run it in QGIS
 
-Install `qgis/biodiversity_potential-0.2.6.zip` with **Plugins → Manage and Install Plugins → Install from ZIP**, then enable **Biodiversity potential** and open **Urban biodiversity potential** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
+Install `qgis/biodiversity_potential-0.3.1.zip` with **Plugins → Manage and Install Plugins → Install from ZIP**, then enable **Biodiversity potential** and open **Urban biodiversity potential 0.3.1** in the Processing toolbox. The area must be in a metre CRS, normally EPSG:27700.
 
 The steps, the parameters, and how to build a floating-point NDVI from Sentinel-2 are in [docs/user-guide.md](docs/user-guide.md). Dataset links and licences are in [docs/data-sources.md](docs/data-sources.md).
 
@@ -81,7 +81,7 @@ The tests cover the model. They do not launch QGIS. NumPy is the only runtime de
 qgis/biodiversity_potential/    QGIS plugin and the Python model
 docs/                           theory, method, data, user guide, references
 examples/riverside_quarter/     synthetic site, grid, and preview
-web/                            Leaflet map and magnifying glass
+web/                            Leaflet map of precomputed indexes
 tests/                          model, crosswalk, example ranks, plugin package
 ```
 

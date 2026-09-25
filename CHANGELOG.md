@@ -2,13 +2,21 @@
 
 ## Unreleased
 
+- Version 0.3.1 puts a Documentation link in the tool description. It opens the user guide in the GitHub repository. The install file is `qgis/biodiversity_potential-0.3.1.zip`.
+
+- The public map shows London only. The legend can be collapsed, and the panel introduces the index from the theory note, with the rest behind Read more.
+
+- Version 0.3.0 is one tool, **Urban biodiversity potential 0.3.0**. The study area is a point plus a radius, or a polygon of any size. A large polygon is scored in tiles. There is no 500 m cap and no second install file. The install file is `qgis/biodiversity_potential-0.3.0.zip`.
+
+- Narrow streams come only from OS Open Map Local `SurfaceWater_Line`. The river-centreline input is removed.
+
 - The legend is a green scale with bands at 0.5, 3, 5, 10, 45 and 85. Each band is one colour. The score is unchanged.
 
-- Version 0.2.5 adds **Surface water lines** for OS Open Map Local `SurfaceWater_Line`, the streams too narrow to appear in `SurfaceWater_Area`. Leave river centrelines empty. On OS Open Rivers, `fictitious` means a straight line, not a culvert.
+- Version 0.2.5 adds **Surface water lines** for OS Open Map Local `SurfaceWater_Line`, the streams too narrow to appear in `SurfaceWater_Area`.
 
 - The method notes now cite a source for each default, including the 250 m neighbourhood. Numbers that are modelling choices are labelled as choices.
 
-- Version 0.2.4 left out Open Rivers links with `fictitious` set. That flag is a straight line, not a culvert. Version 0.2.5 corrects it.
+- Version 0.2.4 misread a river-line geometry flag. Version 0.2.5 corrected that reading. Version 0.3.0 removes the centreline input.
 
 - Version 0.2.3 adds **Tidal water** for OS Open Map Local `TidalWater`, beside `SurfaceWater_Area`. Both score as open water.
 

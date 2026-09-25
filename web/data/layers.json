@@ -131,27 +131,6 @@
       "lon": -0.1278,
       "zoom": 12,
       "tiles": "https://storage.googleapis.com/biodiversity-potential/london/{z}/{x}/{y}.png"
-    },
-    {
-      "id": "birmingham",
-      "title": "Birmingham",
-      "lat": 52.4799,
-      "lon": -1.9026,
-      "zoom": 12
-    },
-    {
-      "id": "manchester",
-      "title": "Manchester",
-      "lat": 53.4794,
-      "lon": -2.2453,
-      "zoom": 12
-    },
-    {
-      "id": "leeds",
-      "title": "Leeds",
-      "lat": 53.7997,
-      "lon": -1.5492,
-      "zoom": 12
     }
   ]
 }

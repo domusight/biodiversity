@@ -52,12 +52,9 @@ _PLACE_NAMES = {
     "sealed_south": "Sealed street in the south",
 }
 
-# View centres for the city buttons. These are camera positions, not scores.
+# The public page opens on London. Other cities are not listed.
 _CITY_VIEWS = (
     ("london", "London", 51.5074, -0.1278, 12),
-    ("birmingham", "Birmingham", 52.4799, -1.9026, 12),
-    ("manchester", "Manchester", 53.4794, -2.2453, 12),
-    ("leeds", "Leeds", 53.7997, -1.5492, 12),
 )
 
 
