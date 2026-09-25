@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Processing algorithm: urban biodiversity potential for a small area."""
+"""Processing algorithm: urban biodiversity potential for a point or a polygon."""
 
 import os
 import shutil
@@ -30,12 +30,20 @@ from qgis.core import (
     QgsWkbTypes,
 )
 
-from .burn import burn_geometry, burn_layer, sample_rasters, snap_grid, write_geotiff
+from . import __version__
+from .burn import (
+    burn_geometry,
+    burn_layer,
+    create_geotiff,
+    sample_rasters,
+    snap_grid,
+    write_array_window,
+    write_geotiff,
+)
 from .crosswalk import SCHEME_ESA, SCHEME_KEYWORD, SCHEME_PRIORITY, combine_habitat_layers, map_priority_habitat, map_value
 from .habitats import Habitat, label
-from .limits import DEMO_RADIUS_M, farthest_from_point, within_demo_radius
 from .model import COMPONENT_ORDER, Weights, ModelConfig, run_model
-from .water import OPEN_RIVERS_NOTE, is_fictitious_geometry, is_hidden_centreline
+from .tiles import core_window, plan_cores
 
 _STYLE = os.path.join(os.path.dirname(__file__), "style", "biodiversity_potential.qml")
 _OUTPUT_NODATA = -9999.0
@@ -77,9 +85,7 @@ class _ApplyStyle(QgsProcessingLayerPostProcessorInterface):
 
 
 class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
-    enforces_demo_limit = True
-    multiple_ndvi = False
-    """Score biodiversity potential on a metre grid inside a small area."""
+    """Score biodiversity potential on a metre grid inside a point buffer or a polygon."""
 
     AOI = "AOI"
     RADIUS = "RADIUS"
@@ -94,7 +100,6 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     OVERLAY = "OVERLAY"
     OVERLAY_FIELD = "OVERLAY_FIELD"
     OVERLAY_SCHEME = "OVERLAY_SCHEME"
-    RIVERS = "RIVERS"
     RIVER_WIDTH = "RIVER_WIDTH"
     SURFACE_WATER_LINE = "SURFACE_WATER_LINE"
     SURFACE_WATER = "SURFACE_WATER"
@@ -104,7 +109,6 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
     ANCIENT = "ANCIENT"
     SSSI = "SSSI"
     LNR = "LNR"
-    NDVI = "NDVI"
     NDVI_1 = "NDVI_1"
     NDVI_2 = "NDVI_2"
     NDVI_3 = "NDVI_3"
@@ -132,7 +136,7 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         return "urban_biodiversity_potential"
 
     def displayName(self):
-        return self.tr("Urban biodiversity potential")
+        return self.tr("Urban biodiversity potential {0}".format(__version__))
 
     def group(self):
         return self.tr("Urban ecology")
@@ -142,8 +146,9 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         return self.tr(
-            "Scores the biodiversity potential of each 10 m cell in a small area. "
-            "This demo accepts a site within 500 m of its centre. "
+            "Scores the biodiversity potential of each 10 m cell. "
+            "The study area is a polygon, or a point layer buffered by the radius you set. "
+            "There is no size cap. A large polygon is scored in tiles. "
             "Each cell still looks 250 m around itself. The score is a 0–100 index built from "
             "patch area, local habitat amount, connectivity, vegetation, "
             "distinctiveness, water, heterogeneity and interior habitat.\n\n"
@@ -151,10 +156,10 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             "survey, and it is not the Statutory Biodiversity Metric. Give it "
             "British National Grid layers: a wall-to-wall land cover such as ESA "
             "WorldCover, OS Open Greenspace, OS Open Map Local surface water lines, "
-            "surface water area and tidal water, the Priority Habitat Inventory, Ancient Woodland, and an "
-            "optional Sentinel-2 NDVI raster. The tool buffers the area itself so "
-            "edge cells can see the surrounding landscape; input layers should "
-            "cover that wider context.\n\n"
+            "surface water area and tidal water, the Priority Habitat Inventory, Ancient Woodland, and "
+            "up to four Sentinel-2 NDVI rasters. Narrow streams are SurfaceWater_Line only. "
+            "The tool reads features inside the area plus the context buffer, so you do not "
+            "clip national layers yourself.\n\n"
             "The reasoning, equations and data catalogue are in the project documentation: "
             "https://github.com/domusight/biodiversity"
         )
@@ -177,7 +182,6 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=250.0,
                 minValue=10.0,
-                maxValue=DEMO_RADIUS_M,
             )
         )
         self.addParameter(
@@ -197,7 +201,6 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=250.0,
                 minValue=10.0,
-                maxValue=DEMO_RADIUS_M,
             )
         )
         self._add_layer(self.BASE, "Base land cover (wall to wall)")
@@ -224,34 +227,21 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         )
         self._add_layer(self.SURFACE_WATER, "Surface water area (OS Open Map Local SurfaceWater_Area)")
         self._add_layer(self.TIDAL_WATER, "Tidal water (OS Open Map Local TidalWater)")
-        self._add_layer(
-            self.RIVERS,
-            "River centrelines (optional; leave empty if Surface water lines is set)",
-        )
         self._add_layer(self.PRIORITY, "Priority Habitat Inventory")
         self._add_field(self.PRIORITY_FIELD, "Priority habitat name field", self.PRIORITY)
         self._add_layer(self.ANCIENT, "Ancient woodland")
         self._add_layer(self.SSSI, "Sites of Special Scientific Interest")
         self._add_layer(self.LNR, "Local Nature Reserves")
-        if self.multiple_ndvi:
-            for name, title in (
-                (self.NDVI_1, "Sentinel-2 NDVI tile 1"),
-                (self.NDVI_2, "Sentinel-2 NDVI tile 2"),
-                (self.NDVI_3, "Sentinel-2 NDVI tile 3"),
-                (self.NDVI_4, "Sentinel-2 NDVI tile 4"),
-            ):
-                self.addParameter(
-                    QgsProcessingParameterRasterLayer(
-                        name,
-                        self.tr(title),
-                        optional=True,
-                    )
-                )
-        else:
+        for name, title in (
+            (self.NDVI_1, "Sentinel-2 NDVI tile 1"),
+            (self.NDVI_2, "Sentinel-2 NDVI tile 2"),
+            (self.NDVI_3, "Sentinel-2 NDVI tile 3"),
+            (self.NDVI_4, "Sentinel-2 NDVI tile 4"),
+        ):
             self.addParameter(
                 QgsProcessingParameterRasterLayer(
-                    self.NDVI,
-                    self.tr("Sentinel-2 NDVI (optional, floating point, about -1 to 1)"),
+                    name,
+                    self.tr(title),
                     optional=True,
                 )
             )
@@ -305,8 +295,6 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
 
         cell = self.parameterAsDouble(parameters, self.CELL, context)
         neighbourhood = self.parameterAsDouble(parameters, self.NEIGHBOURHOOD, context)
-        if self.enforces_demo_limit and neighbourhood > DEMO_RADIUS_M:
-            raise QgsProcessingException(self._demo_limit_message(neighbourhood))
         context_buffer = self.parameterAsDouble(parameters, self.CONTEXT, context)
         if context_buffer < neighbourhood:
             feedback.pushWarning(
@@ -315,57 +303,118 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
             context_buffer = neighbourhood
 
         radius = self.parameterAsDouble(parameters, self.RADIUS, context)
-        if self.enforces_demo_limit and radius > DEMO_RADIUS_M:
-            raise QgsProcessingException(self._demo_limit_message(radius))
         aoi = self._aoi_geometry(aoi_layer, radius)
-        if self.enforces_demo_limit:
-            self._require_demo_extent(aoi)
-        buffered = QgsGeometry(aoi).buffer(context_buffer, 24)
-        grid = snap_grid(buffered.boundingBox(), cell)
+        box = aoi.boundingBox()
+        full = snap_grid(box, cell, max_cells=None)
+        cores = plan_cores(
+            full["xmin"], full["ymin"], full["xmax"], full["ymax"],
+            cell, context_buffer,
+        )
         feedback.pushInfo(
-            "Analysis grid {0} by {1} cells at {2:.0f} m. "
-            "Only the area of interest is written out; the rest is context.".format(
-                grid["width"], grid["height"], cell
+            "Study area grid {0} by {1} cells at {2:.0f} m, scored in {3} tiles. "
+            "Each tile reads inputs only inside that tile plus {4:.0f} m of context.".format(
+                full["width"], full["height"], cell, len(cores), context_buffer
             )
         )
-        feedback.setProgress(8)
 
-        result, habitat, aoi_mask = self._score_window(
-            parameters, context, feedback, aoi, grid, target_crs, cell, neighbourhood
-        )
-        self._log_summary(feedback, result, habitat, aoi_mask)
         output_path = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)
-        index = result.index.astype(float)
-        write_geotiff(
-            output_path, index, grid, target_crs.toWkt(), _OUTPUT_NODATA,
-            ["Biodiversity potential (0-100)"],
-        )
-        self._attach_style(output_path, context)
-        results = {self.OUTPUT: output_path}
-
         components_path = self._optional_path(parameters, self.OUTPUT_COMPONENTS, context)
-        if components_path:
-            stack = []
-            for name in COMPONENT_ORDER:
-                layer = result.components[name]
-                if layer is None:
-                    layer = np.full(index.shape, np.nan)
-                stack.append(layer)
-            write_geotiff(
-                components_path,
-                np.stack(stack),
-                grid,
-                target_crs.toWkt(),
-                _OUTPUT_NODATA,
-                list(COMPONENT_ORDER),
+        want_cells = _value_set(parameters.get(self.OUTPUT_CELLS))
+        if (components_path or want_cells) and len(cores) > 1:
+            feedback.pushWarning(
+                "Component rasters and cell polygons are written when the area fits in one tile. "
+                "This run uses {0} tiles, so only the index raster is written.".format(len(cores))
             )
-            results[self.OUTPUT_COMPONENTS] = components_path
+            components_path = None
+            want_cells = False
 
-        cell_id = self._write_cells(
-            parameters, context, feedback, grid, target_crs, habitat, result, aoi_mask
+        dataset = create_geotiff(
+            output_path, full, target_crs.toWkt(), _OUTPUT_NODATA,
+            "Biodiversity potential (0-100)",
         )
-        if cell_id is not None:
-            results[self.OUTPUT_CELLS] = cell_id
+        scored_any = False
+        single = None
+        results = {self.OUTPUT: output_path}
+        try:
+            for index, core in enumerate(cores, start=1):
+                if feedback.isCanceled():
+                    raise QgsProcessingException("Cancelled.")
+                core_rect = QgsRectangle(core["xmin"], core["ymin"], core["xmax"], core["ymax"])
+                if not QgsGeometry.fromRect(core_rect).intersects(aoi):
+                    feedback.setProgress(int(100 * index / len(cores)))
+                    continue
+                analysis = snap_grid(
+                    QgsRectangle(
+                        core["xmin"] - context_buffer,
+                        core["ymin"] - context_buffer,
+                        core["xmax"] + context_buffer,
+                        core["ymax"] + context_buffer,
+                    ),
+                    cell,
+                )
+                feedback.pushInfo("Tile {0} of {1}.".format(index, len(cores)))
+                result, habitat, mask = self._score_window(
+                    parameters, context, feedback, aoi, analysis, target_crs,
+                    cell, neighbourhood, allow_empty=True,
+                )
+                if result is None:
+                    feedback.setProgress(int(100 * index / len(cores)))
+                    continue
+                column, row, width, height = core_window(analysis, core, cell)
+                destination_column, destination_row, _width, _height = core_window(full, core, cell)
+                write_array_window(
+                    dataset,
+                    full,
+                    result.index[row:row + height, column:column + width],
+                    _OUTPUT_NODATA,
+                    destination_column,
+                    destination_row,
+                )
+                scored_any = True
+                if components_path or want_cells:
+                    single = (result, habitat, analysis, mask, column, row, width, height)
+                feedback.setProgress(int(100 * index / len(cores)))
+        finally:
+            dataset.FlushCache()
+            dataset = None
+
+        if not scored_any:
+            raise QgsProcessingException(
+                "No cells fall inside the area of interest. Check the radius and cell size."
+            )
+
+        self._attach_style(output_path, context)
+        if single is not None:
+            result, habitat, analysis, mask, column, row, width, height = single
+            self._log_summary(feedback, result, habitat, mask)
+            if components_path:
+                stack = []
+                for name in COMPONENT_ORDER:
+                    layer = result.components[name]
+                    if layer is None:
+                        layer = np.full(result.index.shape, np.nan)
+                    stack.append(layer[row:row + height, column:column + width])
+                stacked = np.stack(stack)
+                if stacked.shape[1:] != (full["height"], full["width"]):
+                    feedback.pushWarning(
+                        "Skipping component rasters: the scored tile does not cover the output grid."
+                    )
+                else:
+                    write_geotiff(
+                        components_path,
+                        stacked,
+                        full,
+                        target_crs.toWkt(),
+                        _OUTPUT_NODATA,
+                        list(COMPONENT_ORDER),
+                    )
+                    results[self.OUTPUT_COMPONENTS] = components_path
+            if want_cells:
+                cell_id = self._write_cells(
+                    parameters, context, feedback, analysis, target_crs, habitat, result, mask
+                )
+                if cell_id is not None:
+                    results[self.OUTPUT_CELLS] = cell_id
 
         feedback.setProgress(100)
         return results
@@ -428,13 +477,6 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
                     self._burn_constant(
                         tidal, grid, target_crs, context, feedback,
                         int(Habitat.OPEN_WATER), "Tidal water", True, 0.0,
-                    )
-                )
-            rivers = self.parameterAsVectorLayer(parameters, self.RIVERS, context)
-            if rivers is not None:
-                layers.append(
-                    self._burn_surface_rivers(
-                        rivers, grid, target_crs, context, feedback, line_buffer,
                     )
                 )
             priority = self.parameterAsVectorLayer(parameters, self.PRIORITY, context)
@@ -525,35 +567,12 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         return merged
 
     def _ndvi_layers(self, parameters, context):
-        if self.multiple_ndvi:
-            layers = []
-            for name in (self.NDVI_1, self.NDVI_2, self.NDVI_3, self.NDVI_4):
-                layer = self.parameterAsRasterLayer(parameters, name, context)
-                if layer is not None:
-                    layers.append(layer)
-            return layers
-        single = self.parameterAsRasterLayer(parameters, self.NDVI, context)
-        if single is None:
-            return []
-        return [single]
-
-    def _require_demo_extent(self, geometry):
-        centroid = geometry.centroid().asPoint()
-        xs = []
-        ys = []
-        for vertex in geometry.vertices():
-            xs.append(vertex.x())
-            ys.append(vertex.y())
-        if not within_demo_radius(xs, ys, centroid.x(), centroid.y()):
-            reached = farthest_from_point(xs, ys, centroid.x(), centroid.y())
-            raise QgsProcessingException(self._demo_limit_message(reached))
-
-    def _demo_limit_message(self, reached_m):
-        return (
-            "This demo scores a site within {0:.0f} m of its centre. "
-            "This one reaches {1:.0f} m. For a city boundary, use "
-            "Urban biodiversity potential (large area)."
-        ).format(DEMO_RADIUS_M, reached_m)
+        layers = []
+        for name in (self.NDVI_1, self.NDVI_2, self.NDVI_3, self.NDVI_4):
+            layer = self.parameterAsRasterLayer(parameters, name, context)
+            if layer is not None:
+                layers.append(layer)
+        return layers
 
     def _require_metres(self, crs):
         if not isinstance(crs, QgsCoordinateReferenceSystem) or not crs.isValid():
@@ -607,21 +626,6 @@ class BiodiversityPotentialAlgorithm(QgsProcessingAlgorithm):
         return self._burn_fixed_scheme(
             layer, grid, crs, context, feedback,
             self.PRIORITY_FIELD, parameters, SCHEME_PRIORITY, "Priority Habitat Inventory", False,
-        )
-
-    def _burn_surface_rivers(self, layer, grid, crs, context, feedback, line_buffer):
-        def code_for_feature(feature):
-            attributes = {}
-            for field in feature.fields():
-                attributes[field.name().lower()] = feature[field.name()]
-            if is_hidden_centreline(attributes):
-                return None, "Centrelines described as underground, a culvert, or a tunnel were left out."
-            note = OPEN_RIVERS_NOTE if is_fictitious_geometry(attributes) else None
-            return int(Habitat.OPEN_WATER), note
-
-        return burn_layer(
-            layer, grid, crs, context, code_for_feature, feedback, "Rivers",
-            line_buffer_m=line_buffer, all_touched=True,
         )
 
     def _burn_constant(self, layer, grid, crs, context, feedback, code, label_text, all_touched, line_buffer):

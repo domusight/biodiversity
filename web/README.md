@@ -47,7 +47,7 @@ Set `tiles` on that city in `data/layers.json`:
 
 Choosing the city puts those finished tiles on the map at partial opacity. Rebuilding the example keeps a `tiles` URL that is already in the file. The bucket can use uniform access and grant `allUsers` the Storage Object Viewer role on the tile objects. The page loads them as images.
 
-OS Open Greenspace, OS Open Rivers, Natural England inventories, and any Sentinel-2 NDVI are inputs to the offline run. They are not fetched when someone opens the map.
+OS Open Greenspace, OS Open Map Local surface water, Natural England inventories, and any Sentinel-2 NDVI are inputs to the offline run. They are not fetched when someone opens the map.
 
 ## Publishing
 

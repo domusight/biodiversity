@@ -2,9 +2,9 @@
 
 ## Install
 
-The public install file is `qgis/biodiversity_potential-0.2.6.zip`. The large-area install file is `qgis/biodiversity_potential-city-0.2.6.zip`. Version 0.2.6 is shown on the large-area tool name. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
+The install file is `qgis/biodiversity_potential-0.3.0.zip`. The toolbox name ends in **0.3.0**. In QGIS, open **Plugins → Manage and Install Plugins → Install from ZIP**, choose that file, then turn on **Biodiversity potential**.
 
-Download the zip itself. On GitHub, open the file and use **Download raw file**. A page saved from the browser is HTML, and QGIS then reports that the file is not a zip. The city zip is about 31 KB and begins with the characters `PK`.
+Download the zip itself. On GitHub, open the file and use **Download raw file**. A page saved from the browser is HTML, and QGIS then reports that the file is not a zip. The zip begins with the characters `PK`.
 
 The zip contains one folder, `biodiversity_potential`, with `metadata.txt` inside it. That is the layout QGIS expects. Rebuild it with `make plugin-zip` after a plugin change.
 
@@ -14,30 +14,30 @@ You can also copy the folder `qgis/biodiversity_potential` itself, not the whole
 - macOS: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
 - Windows: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
 
-Restart QGIS. In **Plugins → Manage and Install Plugins**, turn on **Biodiversity potential**. In the Processing toolbox, open **Biodiversity potential → Urban ecology → Urban biodiversity potential**.
+Restart QGIS. In **Plugins → Manage and Install Plugins**, turn on **Biodiversity potential**. In the Processing toolbox, open **Biodiversity potential → Urban ecology → Urban biodiversity potential 0.3.0**.
 
 QGIS 3.28 or later. The area of interest must be in a projected CRS with metre units. For English open data that is British National Grid, EPSG:27700.
 
 ## Run
 
-1. Put the area in as a polygon, or as a point. Points are buffered by the radius, default 250 m. The site must lie within 500 m of its centre. A larger polygon is refused. This copy is a proof-of-concept demo of one neighbourhood, not a city run.
-2. Add whatever of the following you have. One habitat layer is the minimum. The useful set is a wall-to-wall base, OS Open Greenspace, woodland polygons, surface water lines, surface water area, tidal water, the Priority Habitat Inventory, and Ancient Woodland. Leave river centrelines empty.
-3. Optionally add a single-band NDVI raster. See `docs/data-sources.md` for how to calculate it.
-4. Run. The log prints the weights, the number of features used, any class names the crosswalk did not recognise, and the count of cells in each legend class.
+1. Put the area in as a polygon, or as a point. Points are buffered by the radius, default 250 m. A polygon can be a neighbourhood or a city boundary. There is no size cap.
+2. Add whatever of the following you have. One habitat layer is the minimum. The useful set is a wall-to-wall base, OS Open Greenspace, woodland polygons, surface water lines, surface water area, tidal water, the Priority Habitat Inventory, and Ancient Woodland. Narrow streams are OS Open Map Local `SurfaceWater_Line`.
+3. Optionally add up to four Sentinel-2 NDVI rasters. See `docs/data-sources.md` for how to calculate NDVI.
+4. Run. The log prints the weights, the number of features used, any class names the crosswalk did not recognise, and, when the area fits in one tile, the count of cells in each legend class.
 
-The tool builds a grid over the area plus a context buffer (1 km by default), scores every cell, and writes the area of interest. Input layers should cover that wider window. If one of them falls short, the log warns you: the gap is left unrecorded and the edge of the data will score low.
+The tool reads features that meet the area plus a context buffer (1 km by default), scores the area, and writes only the area of interest. A large polygon is split into tiles. You do not need to clip national layers first. If an input falls short of the context, the log warns you: the gap is left unrecorded and the edge of the data will score low.
 
 ### Basic parameters
 
 | Parameter | Default | Meaning |
 | --- | --- | --- |
-| Buffer radius for points | 250 m, maximum 500 m | Ignored when the area is already a polygon. The polygon must still fit inside 500 m of its centre. |
+| Buffer radius for points | 250 m | Ignored when the area is already a polygon. |
 | Cell size | 10 m | Matches Sentinel-2 and WorldCover. |
-| Neighbourhood radius | 250 m, maximum 500 m | Circle used for habitat amount and heterogeneity. |
+| Neighbourhood radius | 250 m | Circle used for habitat amount and heterogeneity. |
 | Base classification | ESA WorldCover | Or keyword labels, habitat codes, greenspace functions, priority-habitat names. |
 | Greenspace function field | choose `function` | OS Open Greenspace. |
 | Assumed width of water lines | 8 m | Buffer for `SurfaceWater_Line`. Narrower lines are thickened to about one cell so they are not missed. |
-| NDVI | optional | Float index, about −1 to 1. |
+| NDVI tiles 1–4 | optional | Float index, about −1 to 1. One raster per row. |
 
 ### Advanced parameters
 
@@ -63,13 +63,13 @@ Turn on the optional component raster to see which term produced a score. The ba
 
 The optional cell polygons carry the same numbers as attributes, for the identify tool. Leave them off on anything larger than a neighbourhood. Above 250,000 cells they are skipped.
 
-## Two tools
+## One tool, any size
 
-The public install file is the demo above. It stops at 500 m.
+The same tool scores a point buffer and a city polygon. Give it the boundary, for example Greater London, and the full national or regional layers. Leave them unclipped. Put OS Open Map Local `SurfaceWater_Line` in **Surface water lines**. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster.
 
-`qgis/biodiversity_potential-city-0.2.6.zip` is the copy for large areas. Install that zip instead of the demo zip on your own QGIS. It adds **Urban biodiversity potential (large area) 0.2.6** beside the demo. Give it the boundary polygon, for example Greater London, and the full national or regional layers. Leave them unclipped. Put OS Open Map Local `SurfaceWater_Line` in **Surface water lines**, and leave **River centrelines** empty. The tool reads only the features that meet the boundary plus the context buffer, scores the boundary in tiles, and writes one raster. The index is the same one the demo uses.
+Component rasters and cell polygons are written when the area fits in one tile. A city run writes the index only, and the log says so.
 
-Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. Version 0.2.6 has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
+Sentinel-2 tiles overlap on purpose. Calculate NDVI for each tile. The tool has four rows, **Sentinel-2 NDVI tile 1** through **tile 4**. Each row is a normal raster input with a file browser. Put one tile on each row. Where two tiles cover the same ground, the first value is kept. A later tile fills only the cells that are still empty.
 
 ## Prepare a repeatable project
 
@@ -88,4 +88,4 @@ The tests cover the distance transform, the crosswalk, the index, and the rank o
 
 The synthetic site and its grid are described in `examples/riverside_quarter/README.md`.
 
-The same example is on the Leaflet map in `web/`. A magnifying glass shows the index as you move. From the repository root, `python3 -m http.server -d web 8765`, then open `http://127.0.0.1:8765/`. See `web/README.md`.
+The same example can be rebuilt for the Leaflet map in `web/`. From the repository root, `python3 -m http.server -d web 8765`, then open `http://127.0.0.1:8765/`. See `web/README.md`. The public site opens on the precomputed London index.
